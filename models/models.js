@@ -58,6 +58,10 @@ const Partner = sequelize.define('partner', {
     img: {type: DataTypes.TEXT},
 })
 
+const LatestDevelopment = sequelize.define('latestDevelopment', {
+    id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
+})
+
 const DeliverySet = sequelize.define('deliverySet', {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
     name: {type: DataTypes.STRING},
@@ -127,43 +131,46 @@ RefreshToken.belongsTo(User)
 User.belongsToMany(Role, {through: UserRole})
 Role.belongsToMany(User, {through: UserRole})
 
-ProductSection.hasMany(Product)
+ProductSection.hasMany(Product, {onDelete: 'CASCADE'})
 Product.belongsTo(ProductSection)
 
-ProductSection.hasOne(Image)
+ProductSection.hasOne(Image, {onDelete: 'CASCADE'})
 Image.belongsTo(ProductSection)
 
-ProductSection.hasOne(Info)
+ProductSection.hasOne(Info, {onDelete: 'CASCADE'})
 Info.belongsTo(ProductSection)
 
-Product.hasOne(Info)
+Product.hasOne(Info, {onDelete: 'CASCADE'})
 Info.belongsTo(Product)
 
-Product.hasMany(DeliverySet)
+Product.hasMany(DeliverySet, {onDelete: 'CASCADE'})
 DeliverySet.belongsTo(Product)
 
-Product.hasMany(Modification)
+Product.hasOne(LatestDevelopment, {onDelete: 'CASCADE'})
+LatestDevelopment.belongsTo(Product)
+
+Product.hasMany(Modification, {onDelete: 'CASCADE'})
 Modification.belongsTo(Product)
 
-Product.hasMany(Image)
+Product.hasMany(Image, {onDelete: 'CASCADE'})
 Image.belongsTo(Product)
 
-Product.hasMany(TechCharacteristic)
+Product.hasMany(TechCharacteristic, {onDelete: 'CASCADE'})
 TechCharacteristic.belongsTo(Product)
 
 Unit.hasMany(TechCharacteristic)
 TechCharacteristic.belongsTo(Unit)
 
-Product.hasMany(Item)
+Product.hasMany(Item, {onDelete: 'CASCADE'})
 Item.belongsTo(Product)
 
-TechCharacteristic.belongsToMany(Item, {through: TechCharacteristicItem})
-Item.belongsToMany(TechCharacteristic, {through: TechCharacteristicItem})
+TechCharacteristic.belongsToMany(Item, {through: TechCharacteristicItem, onDelete: 'CASCADE'})
+Item.belongsToMany(TechCharacteristic, {through: TechCharacteristicItem, onDelete: 'CASCADE'})
 
-Product.hasMany(Function)
+Product.hasMany(Function, {onDelete: 'CASCADE'})
 Function.belongsTo(Product)
 
-Product.hasMany(MonAndIndParam)
+Product.hasMany(MonAndIndParam, {onDelete: 'CASCADE'})
 MonAndIndParam.belongsTo(Product)
 
 
@@ -187,5 +194,6 @@ module.exports = {
     Unit,
     Item,
     Contact,
-    Partner
+    Partner,
+    LatestDevelopment
 }

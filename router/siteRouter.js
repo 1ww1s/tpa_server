@@ -8,6 +8,8 @@ siteRouter.get('/product/images/:slug', siteController.getProductImages)
 siteRouter.get('/product/name/:slug', siteController.getProductNameBySlug)
 siteRouter.get('/product/arrayByName/:name', siteController.getProductsByName)
 siteRouter.get('/product/itemNames', siteController.getProductItemNames)
+siteRouter.get('/product/itemsByProduct/:slug', siteController.getProductItemsOfGroup)
+siteRouter.get('/product/itemsByGroup/:slug', siteController.getProductItemsByGroup)
 
 siteRouter.get('/contact', siteController.getContact)
 
@@ -30,6 +32,7 @@ siteRouter.get('/productPreviews/:slug', siteController.getProductPreviews)
 siteRouter.get('/productPreview/:slug', siteController.getProductPreview)
 
 siteRouter.get('/latestDevelopments', siteController.getLatestDevelopments)
+siteRouter.get('/latestDevelopments/items', siteController.getLatestDevelopmentsItems)
 
 siteRouter.get('/requisite', siteController.getRequisites)
 

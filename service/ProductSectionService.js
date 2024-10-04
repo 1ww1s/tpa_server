@@ -3,13 +3,13 @@ const { ProductSection, Info } = require('../models/models')
 const DataBase = require('../error/DataBaseError')
 const infoService = require('./InfoService')
 const imageService = require('./ImageService')
-const { Op } = require('sequelize')
+const { Op, Sequelize } = require('sequelize')
 
 class ProductSectionService{
     async create(title, info, img){
         const titleSlug = slug(title)
-        const index = await ProductSection.count()
-        const productSection = await ProductSection.create({title, slug: titleSlug, index})
+        const index = await ProductSection.max('index')
+        const productSection = await ProductSection.create({title, slug: titleSlug, index: index + 1 } )
         .catch(e => {throw DataBase.UnprocessableEntity('Название раздела должно быть уникальным')})
         if(info) await infoService.create(info, null, productSection.id)
         if(img) await imageService.create(img.name, img.value, 0, null, productSection.id)
@@ -24,6 +24,12 @@ class ProductSectionService{
 
     async delete(id){
         await ProductSection.destroy({where: {id}})
+    }
+
+    async swap(items){
+        await Promise.all(items.map(async (item, ind) => {
+            await ProductSection.update({index: ind + 1}, {where: {title: item.name}})
+        }))
     }
 
     async get(title, slug, id){
@@ -57,13 +63,13 @@ class ProductSectionService{
     }
 
     async getNames(select = null){
-        const sectionsData = await ProductSection.findAll()
+        const sectionsData = await ProductSection.findAll({order: ['index']})
         let sections;
         if(select){
             sections = sectionsData.map(s => {return {value: s.slug, name: s.title}})
         }
         else{
-            sections = sectionsData.map(s => {return {slug: s.slug, name: s.title}})
+            sections = sectionsData.map(s => {return {slug: s.slug, name: s.title, index: s.index}})
         }
         return sections
     }

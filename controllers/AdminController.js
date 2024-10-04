@@ -32,6 +32,30 @@ class AdminController{
         }
     }
 
+    async createLatestDevelopments(req, res, next){
+        try{
+            const {productId} = req.body;
+            if(!productId) throw RequestError.BadRequest('Продукт не указан')
+            await adminService.createLatestDevelopments(productId)
+            res.json({message: `Последняя разработка успешно добавлена`})
+        }
+        catch(e){
+            next(e)
+        }
+    }
+
+    async deleteLatestDevelopments(req, res, next){
+        try{
+            const {productId} = req.body;
+            if(!productId) throw RequestError.BadRequest('Продукт не указан')
+            await adminService.deleteLatestDevelopments(productId)
+            res.json({message: `Последняя разработка успешно удалена`})
+        }
+        catch(e){
+            next(e)
+        }
+    }
+
     async updateProductSection(req, res, next){
         try{
             const {productGroup: productSection} = req.body;
@@ -51,6 +75,18 @@ class AdminController{
             if(!productSectionId) throw RequestError.BadRequest('Раздел продукции не указан')
             await adminService.deleteProductSection(productSectionId)
             res.json({message: `Раздел продукции успешно удален`})
+        }
+        catch(e){
+            next(e)
+        }
+    }
+
+    async swapProductSection(req, res, next){
+        try{
+            const {items} = req.body;
+            if(!items?.length) throw RequestError.BadRequest('Разделы продукции не указан')
+            await adminService.swapProductSection(items)
+            res.json({message: `Разделы продукции успешно переставлены местами`})
         }
         catch(e){
             next(e)
@@ -241,6 +277,18 @@ class AdminController{
             if(!productId) throw RequestError.BadRequest('Продукт не указан')
             await adminService.deleteProduct(productId)
             res.json({message: 'Продукт успешно удален'})
+        }
+        catch(e){
+            next(e)
+        }
+    }
+
+    async swapProduct(req, res, next){
+        try{
+            const {items} = req.body;
+            if(!items?.length) throw RequestError.BadRequest('Продукты не указаны')
+            await adminService.swapProduct(items)
+            res.json({message: `Разделы продукции успешно переставлены местами`})
         }
         catch(e){
             next(e)

@@ -6,6 +6,7 @@ const contactService = require('../service/ContactService')
 const certificateService = require('../service/CertificateService');
 const partnerService = require("../service/PartnerService");
 const requisiteService = require("../service/RequisiteService");
+const LatestDevelopmentService = require("../service/LatestDevelopmentService");
 
 class SiteController{
 
@@ -63,6 +64,30 @@ class SiteController{
         try {   
             const products = await productService.getItems()
             res.json(products)
+        }
+        catch(e){
+            next(e)
+        }
+    }
+
+    async getProductItemsOfGroup(req, res, next){
+        try {   
+            const slug = req.params.slug;
+            if(!slug) throw RequestError.BadRequest('Нет названия продукта')
+            const itemsOfGroup = await productService.getItemsOfGroup(slug)
+            res.json(itemsOfGroup)
+        }
+        catch(e){
+            next(e)
+        }
+    }
+
+    async getProductItemsByGroup(req, res, next){
+        try {   
+            const slug = req.params.slug;
+            if(!slug) throw RequestError.BadRequest('Нет названия раздела')
+            const itemsOfGroup = await productService.getItemsByGroup(slug)
+            res.json(itemsOfGroup)
         }
         catch(e){
             next(e)
@@ -220,8 +245,18 @@ class SiteController{
 
     async getLatestDevelopments(_, res, next){
         try{
-            const latestDevelopments = await productService.getLatestDevelopments()
+            const latestDevelopments = await LatestDevelopmentService.get()
             res.json(latestDevelopments)
+        }
+        catch(e){
+            next(e)
+        }
+    }
+
+    async getLatestDevelopmentsItems(_, res, next){
+        try{
+            const items = await LatestDevelopmentService.getItems()
+            res.json(items)
         }
         catch(e){
             next(e)

@@ -16,7 +16,6 @@ class RequisiteService{
     }
 
     async delete(id){
-        console.log(999, id)
         return await Requisite.destroy({where: {id}})
     }
 

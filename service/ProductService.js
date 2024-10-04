@@ -17,8 +17,8 @@ class ProductService {
 
     async create(productSectionId, productData){
         const nameSlug = slug(productData.name)
-        const index = await Product.count({where: productSectionId})
-        const product = await Product.create({name: productData.name, slug: nameSlug, index, productSectionId})
+        const index = await Product.max('index', {where: productSectionId})
+        const product = await Product.create({name: productData.name, slug: nameSlug, index: index + 1, productSectionId})
         .catch(e => {throw DataBase.UnprocessableEntity('Название продукта должно быть уникальным')})
 
         await infoService.create(productData.info, product.id, null)
@@ -64,7 +64,7 @@ class ProductService {
     async getPreviews(slug){
         const productSection = await productSectionService.get(null, slug)
         if(!productSection) throw DataBase.NotFound('Данный раздел продукции не найден')
-        const productGroup = await Product.findAll({where: {productSectionId: productSection.id}})
+        const productGroup = await Product.findAll({where: {productSectionId: productSection.id}, order: ['index']})
         const productPreviews = await Promise.all(productGroup.map(async p => {
             const info = await infoService.get(p.id, null)
             const img = (await imageService.get(p.id, null))[0]
@@ -115,40 +115,48 @@ class ProductService {
             const productData = await Product.findAll({where: {productSectionId: ps.id}})
             productData.forEach(p => productItems.push({productGroupSlug: ps.slug, productSlug: p.slug}))
         }))
-        console.log(555555555555, productItems)
         return productItems
     }
 
+    async getItemsOfGroup(slug){
+        const productData = await Product.findOne({where: {slug}})
+        if(!productData) throw DataBase.NotFound('Данный продукт не найден')
+        const productSectionId = productData.productSectionId;
+        const productsOfGroup = await Product.findAll({where: {productSectionId}, order: ['index']})
+        const itemsOfGroup = productsOfGroup.filter(pg => pg.id !== productData.id).map(pg => {return {name: pg.name, slug: pg.slug}})
+        return itemsOfGroup
+    }
+
+    async getItemsByGroup(sectionSlug){
+        const productSection = await productSectionService.get(null, sectionSlug)
+        const productsOfGroup = await Product.findAll({where: {productSectionId: productSection.id}, order: ['index']})
+        const itemsOfGroup = productsOfGroup.map(pg => {return {name: pg.name, slug: pg.slug}})
+        return itemsOfGroup
+    }
+
     async getByNames(name){
-        const products = await Product.findAll({ where:{name: {[Op.startsWith]: name}}})
+        const products = await Product.findAll({ where:{name: {[Op.startsWith]: name}}, order: ['index']})
         return products.map(p => {return {name: p.name, slug: p.slug}})
     }
 
     async delete(id){
-        await infoService.delete(id)
-        await functionService.delete(id)
-        await monAndIndParamService.delete(id)
-        await deliverySetService.deleteAll(id)
-        await imageService.deleteAll(id)
-        await modificationService.deleteAll(id)
-        await techCharacteristicService.deleteAll(id)
-        await ItemService.deleteAll(id)
         return await Product.destroy({where: {id}})
     }
 
+    async swap(items){
+        await Promise.all(items.map(async (item, ind) => {
+            await Product.update({index: ind + 1}, {where: {name: item.name}})
+        }))
+    }
+
     async getLatestDevelopments(){
-        try{
-            const products = await Product.findAll({order: [['createdAt', 'DESC']], limit:4})
+        const products = await Product.findAll({order: [['createdAt', 'DESC']], limit:4})
             const latestDevelopments = await Promise.all(products.map(async p => {
-                const sectionSlug = await productSectionService.get(null, null, p.productSectionId)
-                const img = (await imageService.get(p.id))[0]
-                return {name: p.name, slug: sectionSlug?.slug + '/' + p.slug, img: {name: img?.name, value: img?.value}}
-            }))
-            return latestDevelopments
-        }
-        catch(e){
-            throw e
-        }
+            const sectionSlug = await productSectionService.get(null, null, p.productSectionId)
+            const img = (await imageService.get(p.id))[0]
+            return {name: p.name, slug: sectionSlug?.slug + '/' + p.slug, img: {name: img?.name, value: img?.value}}
+        }))
+        return latestDevelopments
     }
 }
 

@@ -16,11 +16,20 @@ const contactService = require('./ContactService')
 const certificateService = require('./CertificateService')
 const partnerService = require('./PartnerService')
 const requisiteService = require('./RequisiteService')
+const LatestDevelopmentService = require('./LatestDevelopmentService')
 
 class AdminService{
 
     async createProductSection(title, info, img){
         await productSectionService.create(title, info, img)
+    }
+
+    async createLatestDevelopments(productId){
+        await LatestDevelopmentService.create(productId)
+    }
+
+    async deleteLatestDevelopments(productId){
+        await LatestDevelopmentService.delete(productId)
     }
 
     async updateProductSection(productSection){
@@ -34,6 +43,10 @@ class AdminService{
 
     async deleteProductSection(productSectionId){
         await productSectionService.delete(productSectionId)
+    }
+
+    async swapProductSection(items){
+        await productSectionService.swap(items)
     }
 
     async createProduct(product){
@@ -115,6 +128,10 @@ class AdminService{
 
     async deleteProduct(productId){
         await productService.delete(productId)
+    }
+
+    async swapProduct(items){
+        await productService.swap(items)
     }
 
     async updateProduct(product){
