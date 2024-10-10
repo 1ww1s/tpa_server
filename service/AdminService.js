@@ -182,7 +182,6 @@ class AdminService{
 
     async getUsers(){
         const usersData = await userService.getAll()
-        console.log(usersData)
         return usersData.map(user => {return {id: user.id, email: user.email, roles: user.roles.map(role => role.value)}})
     }
     
