@@ -16,7 +16,8 @@ const contactService = require('./ContactService')
 const certificateService = require('./CertificateService')
 const partnerService = require('./PartnerService')
 const requisiteService = require('./RequisiteService')
-const LatestDevelopmentService = require('./LatestDevelopmentService')
+const latestDevelopmentService = require('./LatestDevelopmentService')
+const informationDisclosureService = require('./InformationDisclosureService')
 
 class AdminService{
 
@@ -25,11 +26,11 @@ class AdminService{
     }
 
     async createLatestDevelopments(productId){
-        await LatestDevelopmentService.create(productId)
+        await latestDevelopmentService.create(productId)
     }
 
     async deleteLatestDevelopments(productId){
-        await LatestDevelopmentService.delete(productId)
+        await latestDevelopmentService.delete(productId)
     }
 
     async updateProductSection(productSection){
@@ -65,6 +66,20 @@ class AdminService{
         await certificateService.create(certificate.name, certificate.img.value, certificate.endDate)
     }
     
+    //
+    
+    async createInformationDisclosure(informationDisclosure){
+        await informationDisclosureService.createAll(informationDisclosure.name, informationDisclosure.files)
+    }
+    async updateInformationDisclosure(informationDisclosure){
+        await informationDisclosureService.updateAll(informationDisclosure.id, informationDisclosure.name, informationDisclosure.files)
+    }
+    async deleteInformationDisclosure(informationDisclosureId){
+        await informationDisclosureService.delete(informationDisclosureId)
+    }
+
+    //
+
     async updateRequisite(requisite){
         await requisiteService.update(requisite.id, requisite.name, requisite.value)
     }

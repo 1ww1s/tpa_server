@@ -5,7 +5,7 @@ const { TechCharacteristicItem } = require("../models/models")
 class TechCharacteristicItemService{
 
     async create(value, techCharacteristicId, itemId){
-        return await TechCharacteristicItem.create({value, techCharacteristicId, itemId})
+        return await TechCharacteristicItem.create({value, techCharacteristicId, itemId}).catch(e => {throw DataBase.Conflict(e.message)})
     }
 
     async createAll(tc, newTc, items){
@@ -16,7 +16,7 @@ class TechCharacteristicItemService{
     }
 
     async update(id, value){
-        return await TechCharacteristicItem.update({value}, {where: {id}})
+        return await TechCharacteristicItem.update({value}, {where: {id}}).catch(e => {throw DataBase.Conflict(e.message)})
     }
 
     async updateAll(tc, oldTc, items){
@@ -35,7 +35,7 @@ class TechCharacteristicItemService{
     }
 
     async delete(id){
-        return await TechCharacteristicItem.destroy({where: {id}})    
+        return await TechCharacteristicItem.destroy({where: {id}}).catch(e => {throw DataBase.Conflict(e.message)})    
     }
 
 }

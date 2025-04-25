@@ -2,20 +2,19 @@ const { Modification } = require('../models/models')
 
 class ModificationService{
     async createAll(modifications, productId){
-        return await Promise.all(modifications.map(async mod => await Modification.create({name: mod.name, diesel: mod.diesel, note: mod.note, productId})))
+        return await Promise.all(modifications.map(async mod => await this.create(mod.name, mod.diesel, mod.note, productId)))
     }
 
     async create(name, diesel, note, productId){
-        return await Modification.create({name, diesel, note, productId})
+        return await Modification.create({name, diesel, note, productId}).catch(e => {throw DataBase.Conflict(e.message)})
     }
 
     async get(productId){
-        const modifications = await Modification.findAll({where: {productId}})
-        return modifications
+        return await Modification.findAll({where: {productId}}).catch(e => {throw DataBase.Conflict(e.message)})
     }
 
     async update(id, name, diesel, note){
-        return await Modification.update({name, diesel, note}, {where: {id}})
+        return await Modification.update({name, diesel, note}, {where: {id}}).catch(e => {throw DataBase.Conflict(e.message)})
     }
 
     async updateAll(productId, modifications){
@@ -39,11 +38,11 @@ class ModificationService{
     }
 
     async delete(id){
-        return await Modification.destroy({where: {id}})
+        return await Modification.destroy({where: {id}}).catch(e => {throw DataBase.Conflict(e.message)})
     }
 
     async deleteAll(productId){
-        return await Modification.destroy({where: {productId}})
+        return await Modification.destroy({where: {productId}}).catch(e => {throw DataBase.Conflict(e.message)})
     }
 }
 

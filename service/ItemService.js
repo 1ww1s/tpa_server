@@ -3,24 +3,24 @@ const {Item, TechCharacteristicItem} = require('../models/models')
 
 class ItemService{
     async create(name, productId){
-        return await Item.create({name, productId})
+        return await Item.create({name, productId}).catch(e => {throw DataBase.Conflict(e.message)})
     }
 
     async get(productId){
-        const items = await Item.findAll({where: {productId}})
+        const items = await Item.findAll({where: {productId}}).catch(e => {throw DataBase.Conflict(e.message)})
         return items
     }
 
     async delete(id){
-        await Item.destroy({where: {id}})
+        await Item.destroy({where: {id}}).catch(e => {throw DataBase.Conflict(e.message)})
     }
 
     async deleteAll(productId){
-        await Item.destroy({where: {productId}})
+        await Item.destroy({where: {productId}}).catch(e => {throw DataBase.Conflict(e.message)})
     }
 
     async update(id, name){
-        return await Item.update({name}, {where: {id}})
+        return await Item.update({name}, {where: {id}}).catch(e => {throw DataBase.Conflict(e.message)})
     }
 
     async updateAll(items, oldItems, productId){

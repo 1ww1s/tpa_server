@@ -7,13 +7,13 @@ const ProductService = require("./ProductService")
 class LatestDevelopmentService {
 
     async create(productId){
-        const count = await LatestDevelopment.count()
+        const count = await LatestDevelopment.count().catch(e => {throw DataBase.Conflict(e.message)})
         if(count === 4) throw DataBase.Conflict('Достигнуто максимальное количество последних разработок, удалите одну из них и попробуйте снова')
-        await LatestDevelopment.create({productId})
+        await LatestDevelopment.create({productId}).catch(e => {throw DataBase.Conflict(e.message)})
     }
 
     async delete(productId){
-        await LatestDevelopment.destroy({where: {productId}})
+        await LatestDevelopment.destroy({where: {productId}}).catch(e => {throw DataBase.Conflict(e.message)})
     }
 
     async get(){

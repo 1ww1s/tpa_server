@@ -8,7 +8,7 @@ const siteRouter = require('./siteRouter')
 const router = new Router()
 
 router.use('/user', userRouter)
-router.use('/admin', AuthMiddleware, adminRouter)
+router.use('/admin', AuthMiddleware, CheckRoleMiddleware(['admin', 'moderator']), adminRouter)
 router.use('/site', siteRouter)
 
 module.exports = router

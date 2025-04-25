@@ -13,12 +13,12 @@ class TokenService{
     }
 
     async saveRefreshToken(token, userId){
-        const tokenData = await RefreshToken.findOne({where: {userId}})
+        const tokenData = await RefreshToken.findOne({where: {userId}}).catch(e => {throw DataBase.Conflict(e.message)})
         if(tokenData){
             tokenData.token = token;
             return await tokenData.save()
         }
-        const newToken = await RefreshToken.create({token, userId})
+        const newToken = await RefreshToken.create({token, userId}).catch(e => {throw DataBase.Conflict(e.message)})
         return newToken
     }
     
@@ -43,12 +43,12 @@ class TokenService{
     }
 
     async getUser(token){
-        const user = await RefreshToken.findOne({where: {token}})
+        const user = await RefreshToken.findOne({where: {token}}).catch(e => {throw DataBase.Conflict(e.message)})
         return user
     }
 
     async removeToken(token){
-        await RefreshToken.destroy({where: {token}}).catch(e => {throw Database.Conflict('token не обнаружен')})
+        await RefreshToken.destroy({where: {token}}).catch(e => {throw DataBase.Conflict(e.message)})
     }
 }
 

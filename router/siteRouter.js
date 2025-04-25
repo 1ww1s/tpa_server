@@ -23,6 +23,11 @@ siteRouter.get('/productGroup/name/:slug', siteController.getGroupNameBySlug)
 siteRouter.get('/productGroup/data/:slug', siteController.getGroupBySlug)
 siteRouter.get('/productGroup/arrayByTitle/:title', siteController.getGroupByTitle)
 
+siteRouter.post('/informationDisclosure/arrayByName', siteController.getInformationDisclosureStartsWith)
+siteRouter.post('/informationDisclosure/name', siteController.getInformationDisclosureByName)
+siteRouter.get('/informationDisclosure/getAll', siteController.getAllInformationDisclosure)
+
+
 siteRouter.get('/certificates/', siteController.getCertificates)
 
 siteRouter.get('/partners/', siteController.getPartners)

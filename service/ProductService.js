@@ -10,7 +10,6 @@ const imageService = require('./ImageService')
 const infoService = require('./InfoService')
 const productSectionService = require('./ProductSectionService')
 const { Op } = require('sequelize')
-const ItemService = require('./ItemService')
 
 
 class ProductService {

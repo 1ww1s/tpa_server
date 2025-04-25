@@ -124,6 +124,21 @@ const UserRole = sequelize.define('user_role', {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
 })
 
+const InformationDisclosure = sequelize.define('information_disclosure', {
+    id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
+    name: {type: DataTypes.STRING, unique: true},
+})
+
+const File = sequelize.define('file', {
+    id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
+    name: {type: DataTypes.STRING},
+    value: {type: DataTypes.TEXT},
+})
+
+
+
+InformationDisclosure.hasMany(File, {onDelete: 'CASCADE'})
+File.belongsTo(InformationDisclosure)
 
 User.hasOne(RefreshToken)
 RefreshToken.belongsTo(User)
@@ -195,5 +210,7 @@ module.exports = {
     Item,
     Contact,
     Partner,
-    LatestDevelopment
+    LatestDevelopment,
+    InformationDisclosure,
+    File
 }

@@ -10,16 +10,16 @@ class UnitService{
     }
 
     async update(id, value){
-        await Unit.update({value}, {where: {id}})
+        await Unit.update({value}, {where: {id}}).catch(e => {throw DataBase.Conflict(e.message)})
     }
 
     async getById(id){
-        const unit = await Unit.findOne({where:{id}})
+        const unit = await Unit.findOne({where:{id}}).catch(e => {throw DataBase.Conflict(e.message)})
         return unit
     }
 
     async getByVal(value){
-        const unit = await Unit.findOne({where:{value}})
+        const unit = await Unit.findOne({where:{value}}).catch(e => {throw DataBase.Conflict(e.message)})
         return unit
     }
 
@@ -29,7 +29,7 @@ class UnitService{
     }
 
     async getArrayByVal(value){
-        const units = await Unit.findAll({ where:{value: {[Op.startsWith]: value}}})
+        const units = await Unit.findAll({ where:{value: {[Op.startsWith]: value}}}).catch(e => {throw DataBase.Conflict(e.message)})
         return units.map(u => {return {id: u.id, value: u.value}})
     }
 }

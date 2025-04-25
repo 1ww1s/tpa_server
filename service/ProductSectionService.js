@@ -1,15 +1,15 @@
 const slug = require('slug')
-const { ProductSection, Info } = require('../models/models')
+const { ProductSection } = require('../models/models')
 const DataBase = require('../error/DataBaseError')
 const infoService = require('./InfoService')
 const imageService = require('./ImageService')
-const { Op, Sequelize } = require('sequelize')
+const { Op } = require('sequelize')
 
 class ProductSectionService{
     async create(title, info, img){
         const titleSlug = slug(title)
-        const index = await ProductSection.max('index')
-        const productSection = await ProductSection.create({title, slug: titleSlug, index: index + 1 } )
+        const index = await ProductSection.max('index').catch(e => {throw DataBase.Conflict(e.message)})
+        const productSection = await ProductSection.create({title, slug: titleSlug, index: index + 1 }).catch(e => {throw DataBase.Conflict(e.message)})
         .catch(e => {throw DataBase.UnprocessableEntity('Название раздела должно быть уникальным')})
         if(info) await infoService.create(info, null, productSection.id)
         if(img) await imageService.create(img.name, img.value, 0, null, productSection.id)
@@ -19,29 +19,29 @@ class ProductSectionService{
         const oldProductSection = await this.get(null, null, id)
         if(!oldProductSection) throw DataBase.NotFound('Данный раздел продукции не найден')
         const titleSlug = slug(title)
-        await ProductSection.update({title, slug: titleSlug}, {where: {id}})
+        await ProductSection.update({title, slug: titleSlug}, {where: {id}}).catch(e => {throw DataBase.Conflict(e.message)})
     }
 
     async delete(id){
-        await ProductSection.destroy({where: {id}})
+        await ProductSection.destroy({where: {id}}).catch(e => {throw DataBase.Conflict(e.message)})
     }
 
     async swap(items){
         await Promise.all(items.map(async (item, ind) => {
-            await ProductSection.update({index: ind + 1}, {where: {title: item.name}})
+            await ProductSection.update({index: ind + 1}, {where: {title: item.name}}).catch(e => {throw DataBase.Conflict(e.message)})
         }))
     }
 
     async get(title, slug, id){
         let productSection = null;
-        if(title) productSection = await ProductSection.findOne({where:{title}})
-        if(slug) productSection = await ProductSection.findOne({where:{slug}})
-        if(id) productSection = await ProductSection.findOne({where: {id}})
+        if(title) productSection = await ProductSection.findOne({where:{title}}).catch(e => {throw DataBase.Conflict(e.message)})
+        if(slug) productSection = await ProductSection.findOne({where:{slug}}).catch(e => {throw DataBase.Conflict(e.message)})
+        if(id) productSection = await ProductSection.findOne({where: {id}}).catch(e => {throw DataBase.Conflict(e.message)})
         return productSection
     }
 
   async getData(title){
-        const productSectionData = await ProductSection.findAll({ where:{title: {[Op.startsWith]: title}}})
+        const productSectionData = await ProductSection.findAll({ where:{title: {[Op.startsWith]: title}}}).catch(e => {throw DataBase.Conflict(e.message)})
         if(!productSectionData) throw DataBase.NotFound('Нет такой группы продукции')
         const productSection = await Promise.all(productSectionData.map(async p => {
             const info = await infoService.get(null, p.id)
@@ -52,7 +52,7 @@ class ProductSectionService{
     }
 
     async getAll(isProductSectionData = true){
-        const productSectionData = await ProductSection.findAll({order: ['index']})
+        const productSectionData = await ProductSection.findAll({order: ['index']}).catch(e => {throw DataBase.Conflict(e.message)})
         if(!isProductSectionData) return productSectionData
         const productSection = await Promise.all(productSectionData.map(async p => {
             const info = await infoService.get(null, p.id)
@@ -63,7 +63,7 @@ class ProductSectionService{
     }
 
     async getNames(select = null){
-        const sectionsData = await ProductSection.findAll({order: ['index']})
+        const sectionsData = await ProductSection.findAll({order: ['index']}).catch(e => {throw DataBase.Conflict(e.message)})
         let sections;
         if(select){
             sections = sectionsData.map(s => {return {value: s.slug, name: s.title}})

@@ -8,10 +8,14 @@ class ContactService{
     async createOrUpdate(contact){ 
         const contactData = await Contact.findAndCountAll()
         if(contactData.count){
-            await Contact.update({email: contact.email, telephone: contact.telephone, address: contact.address, openingHours: contact.openingHours}, {where: {id: contactData.rows[0].id}})
+            await Contact.update(
+                {email: contact.email, telephone: contact.telephone, address: contact.address, openingHours: contact.openingHours}, {where: {id: contactData.rows[0].id}}
+            ).catch(e => {throw DataBase.Conflict(e.message)})
         }
         else{
-            await Contact.create({email: contact.email, telephone: contact.telephone, address: contact.address, openingHours: contact.openingHours})
+            await Contact.create(
+                {email: contact.email, telephone: contact.telephone, address: contact.address, openingHours: contact.openingHours}
+            ).catch(e => {throw DataBase.Conflict(e.message)})
         }
     }
 

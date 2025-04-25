@@ -9,7 +9,7 @@ class RoleService{
     }
 
     async get(value){
-        const role = await Role.findOne({where: {value}})
+        const role = await Role.findOne({where: {value}}).catch(e => {throw DataBase.Conflict(e.message)})
         return role
     }
     

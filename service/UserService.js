@@ -21,19 +21,19 @@ class UserService{
     }
 
     async registration(email, password){
-        const candidate = await User.findOne({where:{email}})
+        const candidate = await User.findOne({where:{email}}).catch(e => {throw DataBase.Conflict(e.message)})
         if(candidate) throw AuthError.Conflict('Пользователь уже зарегистрирован')
         const userRole = await roleService.get('user')
         if(!userRole) throw DataBaseError.NotFound("Роль 'user' не найдена")
         const hashPassword = bcrypr.hashSync(password, 5)
-        const user = await User.create({email, password: hashPassword, roleId: userRole.value})
-        await UserRole.create({userId: user.id, roleId: userRole.id})
+        const user = await User.create({email, password: hashPassword, roleId: userRole.value}).catch(e => {throw DataBase.Conflict(e.message)})
+        await UserRole.create({userId: user.id, roleId: userRole.id}).catch(e => {throw DataBase.Conflict(e.message)})
         user.roles = [userRole.value];
         return this.createRes(user)
     }
 
     async login(email, password){
-        const user = await User.findOne({where: {email}, include: Role})
+        const user = await User.findOne({where: {email}, include: Role}).catch(e => {throw DataBase.Conflict(e.message)})
         if(!user) throw DataBaseError.NotFound('Пользователь не зарегистрирован')
         const isPassEquals = bcrypr.compareSync(password, user.password)
         if(!isPassEquals) throw AuthError.UnprocessableEntity('Неверный пароль')
@@ -51,13 +51,13 @@ class UserService{
         const refreshData = await tokenService.getUser(refreshToken)
         if(!refreshData) throw AuthError.UnauthorizedError()
         const userId = refreshData.userId;
-        const user = await User.findOne({where: {id: userId}, include: Role})
+        const user = await User.findOne({where: {id: userId}, include: Role}).catch(e => {throw DataBase.Conflict(e.message)})
         if(!user) throw AuthError.UnauthorizedError()
         return this.createRes(user)
     }
 
     async get(email){
-        const userData = await User.findOne({where: {email}, include: Role})
+        const userData = await User.findOne({where: {email}, include: Role}).catch(e => {throw DataBase.Conflict(e.message)})
         return userData
     }
 
@@ -69,12 +69,12 @@ class UserService{
     }
 
     async addRole(userId, roleId){
-        if(await UserRole.findOne({where: {userId, roleId}})) throw DataBaseError.NotFound('У пользователя уже есть такая роль')
-        await UserRole.create({userId, roleId})
+        if(await UserRole.findOne({where: {userId, roleId}}).catch(e => {throw DataBase.Conflict(e.message)})) throw DataBaseError.NotFound('У пользователя уже есть такая роль')
+        await UserRole.create({userId, roleId}).catch(e => {throw DataBase.Conflict(e.message)})
     }
 
     async deleteRole(userId, roleId){
-        await UserRole.destroy({where: {userId, roleId}})
+        await UserRole.destroy({where: {userId, roleId}}).catch(e => {throw DataBase.Conflict(e.message)})
     }
 
     async getAll(){

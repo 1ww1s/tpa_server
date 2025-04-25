@@ -351,6 +351,46 @@ class AdminController{
         }
     }
 
+    // InformationDisclosure 
+
+    async createInformationDisclosure(req, res, next){
+        try{
+            const {informationDisclosure} = req.body;
+            if(!informationDisclosure || !informationDisclosure.name || !informationDisclosure.files) throw RequestError.BadRequest('Не указан раздел раскрытия информации или нет массива файлов')
+            await adminService.createInformationDisclosure(informationDisclosure)
+            res.json({message: `Раздел раскрытия информации успешно добавлен`})
+        }
+        catch(e){
+            next(e)
+        }
+    }
+
+    async updateInformationDisclosure(req, res, next){
+        try{
+            const {informationDisclosure} = req.body;
+            if(!informationDisclosure || !informationDisclosure.name || !informationDisclosure.files) throw RequestError.BadRequest('Не указан раздел раскрытия информации или нет массива файлов')
+            await adminService.updateInformationDisclosure(informationDisclosure)
+            res.json({message: `Раздел раскрытия информации успешно обновлен`})
+        }
+        catch(e){
+            next(e)
+        }
+    }
+
+    async deleteInformationDisclosure(req, res, next){
+        try{
+            const {id} = req.body;
+            if(!id) throw RequestError.BadRequest('id раздела раскрытия информации не указан')
+            await adminService.deleteInformationDisclosure(id)
+            res.json({message: `Раздел раскрытия информации успешно удален`})
+        }
+        catch(e){
+            next(e)
+        }
+    }
+
+    //
+
 }
 
 module.exports = new AdminController()

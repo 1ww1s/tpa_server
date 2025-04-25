@@ -5,22 +5,22 @@ const { Image } = require("../models/models")
 class ImageService{
 
     async createAll(images, productId){
-        await Promise.all(images.map(async (img, index) => await Image.create({name: img.name, value: img.value, index, productId})))
+        await Promise.all(images.map(async (img, index) => await this.create(img.name, img.value, index, productId)))
     }
 
     async create(name, value, index, productId, productSectionId){
-        await Image.create({name, value, productId, index, productSectionId})
+        await Image.create({name, value, productId, index, productSectionId}).catch(e => {throw DataBase.Conflict(e.message)})
     }
 
     async get(productId, productSectionId){
         let images;
         if(productId) images = await Image.findAll({where: {productId}, order: ['index']})
-        else images = await Image.findOne({where: {productSectionId}})
+        else images = await Image.findOne({where: {productSectionId}}).catch(e => {throw DataBase.Conflict(e.message)})
         return images
     }
 
     async update(id, name, value, index){
-        return await Image.update({name, value, index}, {where:{id}})
+        return await Image.update({name, value, index}, {where:{id}}).catch(e => {throw DataBase.Conflict(e.message)})
     }
 
     async updateAll(productId, images){
@@ -44,11 +44,11 @@ class ImageService{
     }
 
     async delete(id){
-        return await Image.destroy({where: {id}})
+        return await Image.destroy({where: {id}}).catch(e => {throw DataBase.Conflict(e.message)})
     }
 
     async deleteAll(productId){
-        return await Image.destroy({where: {productId}})
+        return await Image.destroy({where: {productId}}).catch(e => {throw DataBase.Conflict(e.message)})
     }
 }
 

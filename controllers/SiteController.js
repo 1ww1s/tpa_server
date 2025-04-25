@@ -6,7 +6,8 @@ const contactService = require('../service/ContactService')
 const certificateService = require('../service/CertificateService');
 const partnerService = require("../service/PartnerService");
 const requisiteService = require("../service/RequisiteService");
-const LatestDevelopmentService = require("../service/LatestDevelopmentService");
+const latestDevelopmentService = require("../service/LatestDevelopmentService");
+const informationDisclosureService = require("../service/InformationDisclosureService");
 
 class SiteController{
 
@@ -135,6 +136,43 @@ class SiteController{
         }
     }
 
+    // InformationDisclosure
+
+    async getInformationDisclosureStartsWith(req, res, next) {
+        try{
+            const name = req.body.name;
+            const itemsData = await informationDisclosureService.startsWith(name)
+            res.json(itemsData.map(item => ({name: item.name})))
+        }
+        catch(e){
+            next(e)
+        }
+    }
+
+    async getInformationDisclosureByName(req, res, next) {
+        try{
+            const name = req.body.name;
+            const informationDisclosure = await informationDisclosureService.getWithFiles(name)
+            res.json(informationDisclosure)
+        }
+        catch(e){
+            next(e)
+        }
+    }
+
+    async getAllInformationDisclosure(req, res, next) {
+        try{
+            const informationDisclosures = await informationDisclosureService.getAll()
+            console.log(informationDisclosures)
+            res.json(informationDisclosures)
+        }
+        catch(e){
+            next(e)
+        }
+    }
+
+    //
+
     async getGroupNameBySlug(req, res, next) {
         try{
             const slug = req.params.slug;
@@ -245,7 +283,7 @@ class SiteController{
 
     async getLatestDevelopments(_, res, next){
         try{
-            const latestDevelopments = await LatestDevelopmentService.get()
+            const latestDevelopments = await latestDevelopmentService.get()
             res.json(latestDevelopments)
         }
         catch(e){
@@ -255,7 +293,7 @@ class SiteController{
 
     async getLatestDevelopmentsItems(_, res, next){
         try{
-            const items = await LatestDevelopmentService.getItems()
+            const items = await latestDevelopmentService.getItems()
             res.json(items)
         }
         catch(e){

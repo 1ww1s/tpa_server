@@ -5,22 +5,24 @@ const { Certificate } = require('../models/models')
 class CertificateService {
 
     async create(name, img, endDate){
-        await Certificate.create({name, img, endDate})
+        await Certificate.create({name, img, endDate}).catch(e => {throw DataBase.Conflict(e.message)})
     }
 
     async delete(id){
-        await Certificate.destroy({where:{id}})
+        await Certificate.destroy({where:{id}}).catch(e => {throw DataBase.Conflict(e.message)})
     }
 
     async get(name, id){
         let certificate;
-        if(name) certificate = await Certificate.findOne({where: {name}})
-        else certificate = await Certificate.findOne({where: {id}})
+        if(name) certificate = await Certificate.findOne({where: {name}}).catch(e => {throw DataBase.Conflict(e.message)})
+        else certificate = await Certificate.findOne({where: {id}}).catch(e => {throw DataBase.Conflict(e.message)})
         return certificate;
     }
 
     async update(certificate){
-        await Certificate.update({name: certificate.name, img: certificate.img.value, endDate: certificate.endDate}, {where: {id: certificate.id}})
+        await Certificate.update(
+            {name: certificate.name, img: certificate.img.value, endDate: certificate.endDate}, {where: {id: certificate.id}}
+        ).catch(e => {throw DataBase.Conflict(e.message)})
     }
 
     async getAll(){

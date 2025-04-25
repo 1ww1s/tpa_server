@@ -4,33 +4,38 @@ const roleRouter = require('./roleRouter')
 const adminController = require('../controllers/AdminController')
 const CheckRoleMiddleware = require('../middleware/CheckRoleMiddleware')
 
-adminRouter.post('/product/create', CheckRoleMiddleware(['admin', 'moderator']), adminController.createProduct)
-adminRouter.post('/product/update', CheckRoleMiddleware(['admin', 'moderator']), adminController.updateProduct)
-adminRouter.post('/product/delete', CheckRoleMiddleware(['admin', 'moderator']), adminController.deleteProduct)
-adminRouter.post('/product/swap', CheckRoleMiddleware(['admin', 'moderator']), adminController.swapProduct)
+adminRouter.post('/product/create', adminController.createProduct)
+adminRouter.post('/product/update', adminController.updateProduct)
+adminRouter.post('/product/delete', adminController.deleteProduct)
+adminRouter.post('/product/swap', adminController.swapProduct)
 
-adminRouter.post('/productGroup/create', CheckRoleMiddleware(['admin', 'moderator']), adminController.createProductSection)
-adminRouter.post('/productGroup/update', CheckRoleMiddleware(['admin', 'moderator']), adminController.updateProductSection)
-adminRouter.post('/productGroup/delete', CheckRoleMiddleware(['admin', 'moderator']), adminController.deleteProductSection)
-adminRouter.post('/productGroup/swap', CheckRoleMiddleware(['admin', 'moderator']), adminController.swapProductSection)
+adminRouter.post('/productGroup/create', adminController.createProductSection)
+adminRouter.post('/productGroup/update', adminController.updateProductSection)
+adminRouter.post('/productGroup/delete', adminController.deleteProductSection)
+adminRouter.post('/productGroup/swap', adminController.swapProductSection)
 
-adminRouter.post('/latestDevelopments/create', CheckRoleMiddleware(['admin', 'moderator']), adminController.createLatestDevelopments)
-adminRouter.post('/latestDevelopments/delete', CheckRoleMiddleware(['admin', 'moderator']), adminController.deleteLatestDevelopments)
+adminRouter.post('/latestDevelopments/create', adminController.createLatestDevelopments)
+adminRouter.post('/latestDevelopments/delete', adminController.deleteLatestDevelopments)
 
-adminRouter.post('/partner/create', CheckRoleMiddleware(['admin', 'moderator']), adminController.createPartner)
-adminRouter.post('/partner/update', CheckRoleMiddleware(['admin', 'moderator']), adminController.updatePartner)
-adminRouter.post('/partner/delete', CheckRoleMiddleware(['admin', 'moderator']), adminController.deletePartner)
+adminRouter.post('/partner/create', adminController.createPartner)
+adminRouter.post('/partner/update', adminController.updatePartner)
+adminRouter.post('/partner/delete', adminController.deletePartner)
 
-adminRouter.post('/certificate/create', CheckRoleMiddleware(['admin', 'moderator']), adminController.createCertificate)
-adminRouter.post('/certificate/update', CheckRoleMiddleware(['admin', 'moderator']), adminController.updateCertificate)
-adminRouter.post('/certificate/delete', CheckRoleMiddleware(['admin', 'moderator']), adminController.deleteCertificate)
+adminRouter.post('/certificate/create', adminController.createCertificate)
+adminRouter.post('/certificate/update', adminController.updateCertificate)
+adminRouter.post('/certificate/delete', adminController.deleteCertificate)
 
-adminRouter.post('/requisite/create', CheckRoleMiddleware(['admin', 'moderator']), adminController.createRequisite)
-adminRouter.post('/requisite/update', CheckRoleMiddleware(['admin', 'moderator']), adminController.updateRequisite)
-adminRouter.post('/requisite/delete', CheckRoleMiddleware(['admin', 'moderator']), adminController.deleteRequisite)
+adminRouter.post('/requisite/create', adminController.createRequisite)
+adminRouter.post('/requisite/update', adminController.updateRequisite)
+adminRouter.post('/requisite/delete', adminController.deleteRequisite)
 
-adminRouter.post('/unit/create', CheckRoleMiddleware(['admin', 'moderator']), adminController.createUnit)
-adminRouter.post('/unit/update', CheckRoleMiddleware(['admin', 'moderator']), adminController.updateUnit)
+adminRouter.post('/unit/create', adminController.createUnit)
+adminRouter.post('/unit/update', adminController.updateUnit)
+
+
+adminRouter.post('/informationDisclosure/create', adminController.createInformationDisclosure)
+adminRouter.post('/informationDisclosure/update', adminController.updateInformationDisclosure)
+adminRouter.post('/informationDisclosure/delete', adminController.deleteInformationDisclosure)
 
 // only admin 
 

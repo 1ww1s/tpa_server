@@ -12,11 +12,11 @@ class RequisiteService{
     }
 
     async update(id, name, value){
-        return await Requisite.update({name, value}, {where: {id}})
+        return await Requisite.update({name, value}, {where: {id}}).catch(e => {throw DataBase.Conflict(e.message)})
     }
 
     async delete(id){
-        return await Requisite.destroy({where: {id}})
+        return await Requisite.destroy({where: {id}}).catch(e => {throw DataBase.Conflict(e.message)})
     }
 
     async getAll(){

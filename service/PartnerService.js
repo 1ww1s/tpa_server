@@ -3,11 +3,11 @@ const { Partner } = require('../models/models')
 class PartnerService {
 
     async create(name, img){
-        await Partner.create({name, img})
+        await Partner.create({name, img}).catch(e => {throw DataBase.Conflict(e.message)})
     }
 
     async delete(id){
-        await Partner.destroy({where:{id}})
+        await Partner.destroy({where:{id}}).catch(e => {throw DataBase.Conflict(e.message)})
     }
 
     // async get(name, id){
@@ -18,7 +18,7 @@ class PartnerService {
     // }
 
     async update(partner){
-        await Partner.update({name: partner.name, img: partner.img.value}, {where: {id: partner.id}})
+        await Partner.update({name: partner.name, img: partner.img.value}, {where: {id: partner.id}}).catch(e => {throw DataBase.Conflict(e.message)})
     }
 
     async getAll(){
