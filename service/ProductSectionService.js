@@ -4,22 +4,27 @@ const DataBase = require('../error/DataBaseError')
 const infoService = require('./InfoService')
 const imageService = require('./ImageService')
 const { Op } = require('sequelize')
+const fileProcessing = require('../middleware/FileProcessing')
 
 class ProductSectionService{
-    async create(title, info, img){
+    async create(title, info, imgName, file){
         const titleSlug = slug(title)
         const index = await ProductSection.max('index').catch(e => {throw DataBase.Conflict(e.message)})
         const productSection = await ProductSection.create({title, slug: titleSlug, index: index + 1 }).catch(e => {throw DataBase.Conflict(e.message)})
-        .catch(e => {throw DataBase.UnprocessableEntity('Название раздела должно быть уникальным')})
         if(info) await infoService.create(info, null, productSection.id)
-        if(img) await imageService.create(img.name, img.value, 0, null, productSection.id)
+        if(imgName && file){
+            const processedImage = await fileProcessing.image('product_group', file)
+            await imageService.create(imgName, processedImage.path, 0, null, productSection.id)
+        }
     }
 
     async update(id, title){
         const oldProductSection = await this.get(null, null, id)
         if(!oldProductSection) throw DataBase.NotFound('Данный раздел продукции не найден')
-        const titleSlug = slug(title)
-        await ProductSection.update({title, slug: titleSlug}, {where: {id}}).catch(e => {throw DataBase.Conflict(e.message)})
+        if(title !== oldProductSection.title){
+            const titleSlug = slug(title)
+            await ProductSection.update({title, slug: titleSlug}, {where: {id}}).catch(e => {throw DataBase.Conflict(e.message)})
+        }
     }
 
     async delete(id){
@@ -46,7 +51,7 @@ class ProductSectionService{
         const productSection = await Promise.all(productSectionData.map(async p => {
             const info = await infoService.get(null, p.id)
             const img = await imageService.get(null, p.id)
-            return {id: p.id, title: p.title, slug: p.slug, info: info?.value, img: {name: img?.name, value: img?.value}}
+            return {id: p.id, title: p.title, slug: p.slug, info: info?.value, img: {id: img?.id, name: img?.name, url: img?.url}}
         }))
         return productSection
     }
@@ -57,7 +62,7 @@ class ProductSectionService{
         const productSection = await Promise.all(productSectionData.map(async p => {
             const info = await infoService.get(null, p.id)
             const img = await imageService.get(null, p.id)
-            return {title: p.title, slug: p.slug, info: info?.value, img: {name: img?.name, value: img?.value}}
+            return {title: p.title, slug: p.slug, info: info?.value, img: {name: img?.name, url: img?.url}}
         }))
         return productSection
     }

@@ -27,8 +27,7 @@ siteRouter.post('/informationDisclosure/arrayByName', siteController.getInformat
 siteRouter.post('/informationDisclosure/name', siteController.getInformationDisclosureByName)
 siteRouter.get('/informationDisclosure/getAll', siteController.getAllInformationDisclosure)
 
-
-siteRouter.get('/certificates/', siteController.getCertificates)
+siteRouter.get('/certificates', siteController.getCertificates)
 
 siteRouter.get('/partners/', siteController.getPartners)
 siteRouter.get('/partners/names', siteController.getPartnersNames)
@@ -37,6 +36,7 @@ siteRouter.get('/productPreviews/:slug', siteController.getProductPreviews)
 siteRouter.get('/productPreview/:slug', siteController.getProductPreview)
 
 siteRouter.get('/latestDevelopments', siteController.getLatestDevelopments)
+siteRouter.post('/latestDevelopment', siteController.getLatestDevelopment)
 siteRouter.get('/latestDevelopments/items', siteController.getLatestDevelopmentsItems)
 
 siteRouter.get('/requisite', siteController.getRequisites)

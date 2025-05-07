@@ -18,31 +18,44 @@ const partnerService = require('./PartnerService')
 const requisiteService = require('./RequisiteService')
 const latestDevelopmentService = require('./LatestDevelopmentService')
 const informationDisclosureService = require('./InformationDisclosureService')
+const deleteFileService = require('./DeleteFileService')
+const path = require('path')
+const fileProcessing = require('../middleware/FileProcessing')
 
 class AdminService{
 
-    async createProductSection(title, info, img){
-        await productSectionService.create(title, info, img)
+    async createProductSection(title, info, imgName, file){
+        await productSectionService.create(title, info, imgName, file)
     }
 
-    async createLatestDevelopments(productId){
-        await latestDevelopmentService.create(productId)
+    async createLatestDevelopments(latestDevelopment, file){
+        await latestDevelopmentService.create(latestDevelopment.title, latestDevelopment.link, file)
     }
 
-    async deleteLatestDevelopments(productId){
-        await latestDevelopmentService.delete(productId)
+    async deleteLatestDevelopment(id){
+        await latestDevelopmentService.delete(id)
     }
 
-    async updateProductSection(productSection){
+    async updateProductSection(productSection, imageName, file){
         await productSectionService.update(productSection.id, productSection.title)
         await infoService.update(null, productSection)
-        const oldImg = await imageService.get(null, productSection.id)
-        if(oldImg.value != productSection.img.value){
-            await imageService.update(oldImg.id, productSection.img.name, productSection.img.value, 0)
+        if(file){
+            const processedImage = await fileProcessing.image('product_group', file)
+            const imageUrl = processedImage.path;
+            const oldImg = await imageService.get(null, productSection.id)
+            if(oldImg){
+                await imageService.update(oldImg.id, imageName, imageUrl)
+                const p = path.join(__dirname, '..', oldImg.url)
+                await deleteFileService.safeDeleteFile(p)
+            }
+            else{
+                await imageService.create(imageName, imageUrl, 0, null, productSection.id)
+            }
         }
     }
 
     async deleteProductSection(productSectionId){
+        await imageService.deleteAll(null, productSectionId)
         await productSectionService.delete(productSectionId)
     }
 
@@ -50,29 +63,31 @@ class AdminService{
         await productSectionService.swap(items)
     }
 
-    async createProduct(product){
+    async createProduct(product, files){
         const productSectionData = await productSectionService.get(null, product.groupName) 
         if(!productSectionData) throw RequestError.BadRequest('Такого названия раздела продукции не существует')
-        await productService.create(productSectionData.id, product)
+        await productService.create(productSectionData.id, product, files)
     }
 
-    async updateCertificate(certificate){
-        await certificateService.update(certificate)
+    async createCertificate(certificate, file){
+        await certificateService.create(certificate.name, file, certificate.endDate)
+    }
+    async updateCertificate(certificate, file){
+        await certificateService.update(certificate, file)
+        
     }
     async deleteCertificate(certificateId){
         await certificateService.delete(certificateId)
     }
-    async createCertificate(certificate){
-        await certificateService.create(certificate.name, certificate.img.value, certificate.endDate)
-    }
     
     //
     
-    async createInformationDisclosure(informationDisclosure){
-        await informationDisclosureService.createAll(informationDisclosure.name, informationDisclosure.files)
+    async createInformationDisclosure(informationDisclosure, files){
+        await informationDisclosureService.createAll(informationDisclosure.name, informationDisclosure.files, files)
     }
-    async updateInformationDisclosure(informationDisclosure){
-        await informationDisclosureService.updateAll(informationDisclosure.id, informationDisclosure.name, informationDisclosure.files)
+    async updateInformationDisclosure(informationDisclosure, files){
+        const processedFiles = await fileProcessing.files('pdf', files)
+        await informationDisclosureService.updateAll(informationDisclosure.id, informationDisclosure.name, informationDisclosure.files, processedFiles)
     }
     async deleteInformationDisclosure(informationDisclosureId){
         await informationDisclosureService.delete(informationDisclosureId)
@@ -134,7 +149,6 @@ class AdminService{
         await imageService.createAll(images, productId)
     }
 
-    
     async createMonAndIndParams(productId, monAndIndParams){
         const product = await productService.get(productId)
         if(!product) throw RequestError.BadRequest('Продукт не найден')
@@ -142,6 +156,7 @@ class AdminService{
     }
 
     async deleteProduct(productId){
+        await imageService.deleteAll(productId)
         await productService.delete(productId)
     }
 
@@ -149,10 +164,11 @@ class AdminService{
         await productService.swap(items)
     }
 
-    async updateProduct(product){
+    async updateProduct(product, files){
         await productService.update(product)
         await infoService.update(product)
-        await imageService.updateAll(product.id, product.images)
+        const processedImages = await fileProcessing.images('product', files)
+        await imageService.updateAll(product.id, product.images, processedImages)
         await functionService.update(product.id, product.functions)
         await monAndIndParamService.update(product.id, product.monAndIndParams)
         await deliverySetService.updateAll(product.id, product.deliverySet)

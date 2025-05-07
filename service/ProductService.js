@@ -10,15 +10,16 @@ const imageService = require('./ImageService')
 const infoService = require('./InfoService')
 const productSectionService = require('./ProductSectionService')
 const { Op } = require('sequelize')
+const fileProcessing = require('../middleware/FileProcessing')
 
 
 class ProductService {
 
-    async create(productSectionId, productData){
+    async create(productSectionId, productData, files){
         const nameSlug = slug(productData.name)
         const index = await Product.max('index', {where: productSectionId})
         const product = await Product.create({name: productData.name, slug: nameSlug, index: index + 1, productSectionId})
-        .catch(e => {throw DataBase.UnprocessableEntity('Название продукта должно быть уникальным')})
+        .catch(e => {throw DataBase.UnprocessableEntity(e.message)})
 
         await infoService.create(productData.info, product.id, null)
         await functionService.create(productData.functions, product.id)
@@ -26,7 +27,8 @@ class ProductService {
         await modificationService.createAll(productData.modifications, product.id)
         await monAndIndParamService.create(productData.monAndIndParams, product.id)
         await techCharacteristicService.createAll(productData.techCharacteristics, product.id)
-        await imageService.createAll(productData.images, product.id)
+        const processedImages = await fileProcessing.images('product', files)
+        await imageService.createAll(productData.images.map((pImage, ind) => ({name: pImage.name, url: processedImages[ind].path})), product.id)
     }
 
     async getAll(slug){
@@ -56,7 +58,7 @@ class ProductService {
     async getImages(slug){
         const productData = await this.get(null, slug)
         if(!productData) throw DataBase.NotFound('Данный продукт не найден')
-        const images = (await imageService.get(productData.id)).map(img => { return {id: img.id, name: img.name, value: img.value} })
+        const images = (await imageService.get(productData.id)).map(img => { return {id: img.id, name: img.name, url: img.url}})
         return images
     }
 
@@ -67,7 +69,7 @@ class ProductService {
         const productPreviews = await Promise.all(productGroup.map(async p => {
             const info = await infoService.get(p.id, null)
             const img = (await imageService.get(p.id, null))[0]
-            return {id: p.id, title: p.name, slug: slug + '/' + p.slug, info: info.value, img: {name: img?.name, value: img?.value}}
+            return {id: p.id, title: p.name, slug: slug + '/' + p.slug, info: info.value, img: {name: img?.name, url: img?.url}}
         }))
         return productPreviews
     }   
@@ -76,7 +78,7 @@ class ProductService {
         const product = await Product.findOne({where: {slug}})
         const info = await infoService.get(product.id, null)
         const img = (await imageService.get(product.id, null))[0]
-        const productPreview = {id: product.id, title: product.name, slug: product.slug, info: info.value, img: {name: img?.name, value: img?.value}}
+        const productPreview = {id: product.id, title: product.name, slug: product.slug, info: info.value, img: {name: img?.name, url: img?.url}}
         return productPreview
     }  
 
@@ -110,7 +112,6 @@ class ProductService {
         const productSection = await productSectionService.getAll(false)
         const productItems = []
         await Promise.all(productSection.map(async ps => {
-            console.log(ps.idy)
             const productData = await Product.findAll({where: {productSectionId: ps.id}})
             productData.forEach(p => productItems.push({productGroupSlug: ps.slug, productSlug: p.slug}))
         }))

@@ -1,8 +1,5 @@
-const e = require('express');
 const RequestError = require('../error/RequestError');
 const adminService = require('../service/AdminService');
-const unitService = require('../service/UnitService');
-
 // await new Promise(resolve => setTimeout(resolve, 4000))
 
 class AdminController{
@@ -19,24 +16,13 @@ class AdminController{
         }
     }
 
-    async createProductSection(req, res, next){
-        try{
-            const {productGroup: productSection} = req.body;
-            if(!productSection) throw RequestError.BadRequest('Раздел продукции не указан')
-            if(!productSection.title || !productSection.info || !productSection.img)throw RequestError.BadRequest('Одно из обязательных полей пустое')
-            await adminService.createProductSection(productSection.title, productSection.info, productSection.img)
-            res.json({message: `Раздел продукции успешно добавлен`})
-        }
-        catch(e){
-            next(e)
-        }
-    }
-
     async createLatestDevelopments(req, res, next){
         try{
-            const {productId} = req.body;
-            if(!productId) throw RequestError.BadRequest('Продукт не указан')
-            await adminService.createLatestDevelopments(productId)
+            const file = req.file;
+            const latestDevelopment = JSON.parse(req.body.data);
+            if(!latestDevelopment.title || !latestDevelopment.link || !file) 
+                throw RequestError.BadRequest('Одно из обязательных полей пустое(latestDevelopment.title, latestDevelopment.link, file)')
+            await adminService.createLatestDevelopments(latestDevelopment, file)
             res.json({message: `Последняя разработка успешно добавлена`})
         }
         catch(e){
@@ -46,9 +32,9 @@ class AdminController{
 
     async deleteLatestDevelopments(req, res, next){
         try{
-            const {productId} = req.body;
-            if(!productId) throw RequestError.BadRequest('Продукт не указан')
-            await adminService.deleteLatestDevelopments(productId)
+            const {id} = req.body;
+            if(!id) throw RequestError.BadRequest('id не указан')
+            await adminService.deleteLatestDevelopment(id)
             res.json({message: `Последняя разработка успешно удалена`})
         }
         catch(e){
@@ -56,16 +42,39 @@ class AdminController{
         }
     }
 
+    // ProductSection
+
+    async createProductSection(req, res, next){
+        try{
+            const file = req.file;
+            const productSection = JSON.parse(req.body.data);
+            if(!productSection.title || !productSection.info || !productSection.img.name || !file) 
+                throw RequestError.BadRequest('Одно из обязательных полей пустое(productSection.title, productSection.info, productSection.img.name, file)')
+            await adminService.createProductSection(productSection.title, productSection.info, productSection.img.name, file)
+            res.json({message: `Раздел продукции успешно добавлен`})
+        }
+        catch(e){
+            next(e)
+        }
+        finally{
+            file.buffer = null;
+        }
+    }
+
     async updateProductSection(req, res, next){
         try{
-            const {productGroup: productSection} = req.body;
-            if(!productSection) throw RequestError.BadRequest('Раздел продукции не указан')
-            if(!productSection.id || !productSection.title || !productSection.info || !productSection.img) throw RequestError.BadRequest('Одно из обязательных полей пустое')
-            await adminService.updateProductSection(productSection)
+            const file = req.file;
+            const productSection = JSON.parse(req.body.data);
+            if(!productSection.title || !productSection.info || !productSection.img) 
+                throw RequestError.BadRequest('Одно из обязательных полей пустое(productSection.title, productSection.info, productSection.img)')
+            await adminService.updateProductSection(productSection, productSection.img.name, file)
             res.json({message: `Раздел продукции успешно обновлен`})
         }
         catch(e){
             next(e)
+        }
+        finally{
+            file.buffer = null;
         }
     }
 
@@ -95,40 +104,54 @@ class AdminController{
 
     async createProduct(req, res, next){
         try{
-            const {product} = req.body;
-            if(!product) throw RequestError.BadRequest('Продукт не указан')
-            if(!product.name || !product.groupName || !product.info || !product.images.length) throw RequestError.BadRequest('Одно из обязательных полей пустое')
-            await adminService.createProduct(product)
+            const files = req.files;
+            const product = JSON.parse(req.body.data);
+            if(!product.name || !product.info || !product.images.length) 
+                throw RequestError.BadRequest('Одно из обязательных полей пустое(product.name, product.info, product.images.length)')
+            await adminService.createProduct(product, files)
             res.json({message: `Продукция успешно добавлена`})
         }
         catch(e){
             next(e)
         }
+        finally{
+            req.files.map(file => {
+                file.buffer = null;
+            })
+        }
     }
 
     async createCertificate(req, res, next){
         try{
-            const {certificate} = req.body;
-            if(!certificate) throw RequestError.BadRequest('Сертификат не указан')
-            if(!certificate.name | !certificate.img | !certificate.endDate) throw RequestError.BadRequest('Одно из обязательных полей пустое')
-            await adminService.createCertificate(certificate)
+            const file = req.file;
+            const certificate = JSON.parse(req.body.data);
+            if(!certificate.name || !certificate.img || !certificate.endDate || !file) 
+                throw RequestError.BadRequest('Одно из обязательных полей пустое(certificate.name, certificate.img, certificate.endDate, file)')
+            await adminService.createCertificate(certificate, file)
             res.json({message: `Сертификат успешно добавлен`})
         }
         catch(e){
             next(e)
         }
+        finally{
+            file.buffer = null;
+        }
     }
 
     async updateCertificate(req, res, next){
         try{
-            const {certificate} = req.body;
-            if(!certificate) throw RequestError.BadRequest('Сертификат не указан')
-            if(!certificate.name | !certificate.img | !certificate.endDate) throw RequestError.BadRequest('Одно из обязательных полей пустое')
-            await adminService.updateCertificate(certificate)
+            const file = req.file;
+            const certificate = JSON.parse(req.body.data);
+            if(!certificate.name || !certificate.img || !certificate.endDate) 
+                throw RequestError.BadRequest('Одно из обязательных полей пустое(certificate.name, certificate.img, certificate.endDate)')
+            await adminService.updateCertificate(certificate, file)
             res.json({message: `Сертификаты успешно обновлен`})
         }
         catch(e){
             next(e)
+        }
+        finally{
+            file.buffer = null;
         }
     }
 
@@ -148,7 +171,7 @@ class AdminController{
         try{
             const {requisite} = req.body;
             if(!requisite) throw RequestError.BadRequest('Реквизит не указан')
-            if(!requisite.name | !requisite.value) throw RequestError.BadRequest('Одно из обязательных полей пустое')
+            if(!requisite.name || !requisite.value) throw RequestError.BadRequest('Одно из обязательных полей пустое')
             await adminService.createRequisite(requisite)
             res.json({message: `Реквизит успешно добавлен`})
         }
@@ -161,7 +184,7 @@ class AdminController{
         try{
             const {requisite} = req.body;
             if(!requisite) throw RequestError.BadRequest('Реквизит не указан')
-            if(!requisite.id | !requisite.name | !requisite.value) throw RequestError.BadRequest('Одно из обязательных полей пустое')
+            if(!requisite.id || !requisite.name || !requisite.value) throw RequestError.BadRequest('Одно из обязательных полей пустое')
             await adminService.updateRequisite(requisite)
             res.json({message: `Реквизит успешно обновлен`})
         }
@@ -186,7 +209,7 @@ class AdminController{
         try{
             const {partner} = req.body;
             if(!partner) throw RequestError.BadRequest('Информация о партнере не указана')
-            if(!partner.name | !partner.img) throw RequestError.BadRequest('Одно из обязательных полей пустое')
+            if(!partner.name || !partner.img) throw RequestError.BadRequest('Одно из обязательных полей пустое')
             await adminService.createPartner(partner)
             res.json({message: `Партнер успешно добавлен`})
         }
@@ -199,7 +222,7 @@ class AdminController{
         try{
             const {partner} = req.body;
             if(!partner) throw RequestError.BadRequest('Информация о партнере не указана')
-            if(!partner.name | !partner.img) throw RequestError.BadRequest('Одно из обязательных полей пустое')
+            if(!partner.name || !partner.img) throw RequestError.BadRequest('Одно из обязательных полей пустое')
             await adminService.updatePartner(partner)
             res.json({message: `Партнер успешно обновлен`})
         }
@@ -235,14 +258,20 @@ class AdminController{
 
     async updateProduct(req, res, next){
         try{
-            const {product} = req.body;
-            if(!product) throw RequestError.BadRequest('Продукт не указан')
-            if(!product.id || !product.name || !product.groupName || !product.info || !product.images.length) throw RequestError.BadRequest('Одно из обязательных полей пустое')
-            await adminService.updateProduct(product)
+            const files = req.files;
+            const product = JSON.parse(req.body.data);
+            if(!product.id || !product.name || !product.info || !product.images.length) 
+                throw RequestError.BadRequest('Одно из обязательных полей пустое(product.id, product.name, product.info, product.images.length)')
+            await adminService.updateProduct(product, files)
             res.json({message: 'Успешное обновление'})
         }
         catch(e){
             next(e)
+        }
+        finally{
+            req.files.map(file => {
+                file.buffer = null;
+            })
         }
     }
 
@@ -355,25 +384,39 @@ class AdminController{
 
     async createInformationDisclosure(req, res, next){
         try{
-            const {informationDisclosure} = req.body;
-            if(!informationDisclosure || !informationDisclosure.name || !informationDisclosure.files) throw RequestError.BadRequest('Не указан раздел раскрытия информации или нет массива файлов')
-            await adminService.createInformationDisclosure(informationDisclosure)
+            const files = req.files;
+            const informationDisclosure = JSON.parse(req.body.data);
+            if(!informationDisclosure || !informationDisclosure.name || !informationDisclosure.files.length) 
+                throw RequestError.BadRequest('Одно из обязательных полей пустое(informationDisclosure, informationDisclosure.name, informationDisclosure.files.length)')
+            await adminService.createInformationDisclosure(informationDisclosure, files)
             res.json({message: `Раздел раскрытия информации успешно добавлен`})
         }
         catch(e){
             next(e)
         }
+        finally{
+            req.files.map(file => {
+                file.buffer = null;
+            })
+        }
     }
 
     async updateInformationDisclosure(req, res, next){
         try{
-            const {informationDisclosure} = req.body;
-            if(!informationDisclosure || !informationDisclosure.name || !informationDisclosure.files) throw RequestError.BadRequest('Не указан раздел раскрытия информации или нет массива файлов')
-            await adminService.updateInformationDisclosure(informationDisclosure)
+            const files = req.files;
+            const informationDisclosure = JSON.parse(req.body.data);
+            if(!informationDisclosure || !informationDisclosure.name || !informationDisclosure.files.length) 
+                throw RequestError.BadRequest('Одно из обязательных полей пустое(informationDisclosure, informationDisclosure.name, informationDisclosure.files.length)')
+            await adminService.updateInformationDisclosure(informationDisclosure, files)
             res.json({message: `Раздел раскрытия информации успешно обновлен`})
         }
         catch(e){
             next(e)
+        }
+        finally{
+            req.files.map(file => {
+                file.buffer = null;
+            })
         }
     }
 

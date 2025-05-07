@@ -160,10 +160,9 @@ class SiteController{
         }
     }
 
-    async getAllInformationDisclosure(req, res, next) {
+    async getAllInformationDisclosure(_, res, next) {
         try{
             const informationDisclosures = await informationDisclosureService.getAll()
-            console.log(informationDisclosures)
             res.json(informationDisclosures)
         }
         catch(e){
@@ -283,8 +282,21 @@ class SiteController{
 
     async getLatestDevelopments(_, res, next){
         try{
-            const latestDevelopments = await latestDevelopmentService.get()
+            const latestDevelopments = await latestDevelopmentService.getAll()
             res.json(latestDevelopments)
+        }
+        catch(e){
+            next(e)
+        }
+    }
+
+    async getLatestDevelopment(req, res, next){
+        try{
+            const {item} = req.body;
+            if(!item.title) 
+                throw RequestError.BadRequest('Нет item.title')
+            const latestDevelopment = await latestDevelopmentService.get(item.title)
+            res.json(latestDevelopment)
         }
         catch(e){
             next(e)

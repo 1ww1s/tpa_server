@@ -40,16 +40,16 @@ const Product = sequelize.define('product', {
 
 const Image = sequelize.define('image', {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
-    name: {type: DataTypes.STRING},
-    value: {type: DataTypes.TEXT},
+    name: {type: DataTypes.STRING(400)},
+    url: {type: DataTypes.STRING(400)},
     index: {type: DataTypes.INTEGER},
 })
 
 const Certificate = sequelize.define('certificate', {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
-    name: {type: DataTypes.STRING},
-    img: {type: DataTypes.TEXT},
-    endDate: {type: DataTypes.STRING}
+    name: {type: DataTypes.STRING(100)},
+    imageUrl: {type: DataTypes.STRING(300)},
+    endDate: {type: DataTypes.STRING(40)}
 })
 
 const Partner = sequelize.define('partner', {
@@ -60,6 +60,10 @@ const Partner = sequelize.define('partner', {
 
 const LatestDevelopment = sequelize.define('latestDevelopment', {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
+    title: {type: DataTypes.STRING, unique: true},
+    link: {type: DataTypes.STRING},
+    imageUrl: {type: DataTypes.STRING},
+    index: {type: DataTypes.INTEGER},
 })
 
 const DeliverySet = sequelize.define('deliverySet', {
@@ -67,6 +71,7 @@ const DeliverySet = sequelize.define('deliverySet', {
     name: {type: DataTypes.STRING},
     numb: {type: DataTypes.STRING},
     note: {type: DataTypes.TEXT},
+    index: {type: DataTypes.INTEGER},
 })
 
 const Modification = sequelize.define('modification', {
@@ -74,11 +79,13 @@ const Modification = sequelize.define('modification', {
     name: {type: DataTypes.STRING},
     diesel: {type: DataTypes.STRING},
     note: {type: DataTypes.TEXT},
+    index: {type: DataTypes.INTEGER},
 })
 
 const TechCharacteristic = sequelize.define('techCharacteristic', {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
     name: {type: DataTypes.STRING},
+    index: {type: DataTypes.INTEGER},
 })
 
 const Item = sequelize.define('item', {
@@ -95,7 +102,6 @@ const Unit = sequelize.define('unit', {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
     value: {type: DataTypes.STRING, unique: true},
 })
-
 
 const Function = sequelize.define('function', {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
@@ -131,8 +137,9 @@ const InformationDisclosure = sequelize.define('information_disclosure', {
 
 const File = sequelize.define('file', {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
-    name: {type: DataTypes.STRING},
-    value: {type: DataTypes.TEXT},
+    name: {type: DataTypes.STRING(400)},
+    url: {type: DataTypes.STRING(400)},
+    index: {type: DataTypes.INTEGER},
 })
 
 

@@ -24,7 +24,7 @@ class TechCharacteristicItemService{
             if(~v.id){
                 const oldV = oldTc.value.find(oldV => oldV.id === v.id)
                 if(v.value !== oldV.value){
-                    this.update(v.id, v.value)
+                    await this.update(v.id, v.value)
                 }
             }
             else {

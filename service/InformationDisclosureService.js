@@ -2,24 +2,26 @@ const { Op } = require("sequelize");
 const DataBase = require("../error/DataBaseError");
 const { InformationDisclosure, File } = require("../models/models");
 
-const fileService = require('./FileService')
+const fileService = require('./FileService');
+const fileProcessing = require("../middleware/FileProcessing");
 
 class InformationDisclosureService {InformationDisclosure
 
-    async createAll(name, files){
+    async createAll(name, filesNames, files){
         const informationDisclosure = await this.create(name)
-        await Promise.all(files.map(async file => {
-            await fileService.create(file.name, file.value, informationDisclosure.id)
+        const processedFiles = await fileProcessing.files('pdf', files)
+        await Promise.all(processedFiles.map(async (file, ind) => {
+            await fileService.create(filesNames[ind].name, file.path, ind, informationDisclosure.id)
         }))
     }
     
-    async updateAll(id, name, files){
-        await this.update({name}, {id})
+    async updateAll(id, name, filesNames, processedFiles){
+        await this.update(id, name)
         const oldInformationDisclosure = await this.get(id)
         if(oldInformationDisclosure.name !== name){
             await this.update(oldInformationDisclosure.id, name)
         }
-        await fileService.updateAll(oldInformationDisclosure.id, files)
+        await fileService.updateAll(oldInformationDisclosure.id, filesNames, processedFiles)
     }
 
     async getWithFiles(name){
@@ -29,7 +31,7 @@ class InformationDisclosureService {InformationDisclosure
         return {
             id: informationDisclosureData.id,
             name: informationDisclosureData.name,
-            files: filesData.map(file => ({id: file.id, name: file.name, value: file.value}))
+            files: filesData.map(file => ({id: file.id, name: file.name, url: file.url}))
         }
     }
 
@@ -61,7 +63,6 @@ class InformationDisclosureService {InformationDisclosure
         return await InformationDisclosure.destroy({where: {id}}).catch(e => {throw DataBase.Conflict(e.message)})
     }
 
-    
     async startsWith(name){
         return await InformationDisclosure.findAll({ where:{name: {[Op.startsWith]: name}}}).catch(e => {throw DataBase.Conflict(e.message)})
     }
