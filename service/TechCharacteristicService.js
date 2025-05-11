@@ -56,16 +56,29 @@ class TechCharacteristicService {
 
     async getAll(productId){
         const itemsData = await Item.findAll({where: {productId}, include: TechCharacteristic}).catch(e => {throw DataBase.Conflict(e.message)})
-        const techCharacteristicData = await TechCharacteristic.findAll({where: {productId}, order: ['index'], include: Item}).catch(e => {throw DataBase.Conflict(e.message)})
-        const techCharacteristics = await Promise.all(techCharacteristicData.map(async tc =>  {
+        const techCharacteristicData = await TechCharacteristic.findAll(
+            {
+                where: {productId}, 
+                order: ['index'], 
+                include: [
+                    {
+                        model: Item,
+                    }
+                ]
+            }
+        ).catch(e => {throw DataBase.Conflict(e.message)})
+        const techCharacteristics = await Promise.all(techCharacteristicData.map(async (tc, ind) =>  {
             const unit = (await unitService.getById(tc.unitId)).value
-            const value = tc.items.map(i => {return {id: i.techCharacteristic_item.id, value: i.techCharacteristic_item.value}})
+            const value = (tc.items.map(i => (
+                {name: i.name, id: i.techCharacteristic_item.id, value: i.techCharacteristic_item.value}))
+            ).sort((a, b) => b.name.localeCompare(a.name))
+            
             return {
                 id: tc.id,
                 index: tc.index,
                 name: tc.name,
                 unit: unit,
-                value
+                value: value.map(v => ({id: v.id, value: v.value}))
             }
         }))
         return{

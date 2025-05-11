@@ -34,6 +34,10 @@ class TechCharacteristicItemService{
         }))
     }
 
+    async getAll(itemId) {
+        return await TechCharacteristicItem.findAll({where: {itemId}})
+    }
+
     async delete(id){
         return await TechCharacteristicItem.destroy({where: {id}}).catch(e => {throw DataBase.Conflict(e.message)})    
     }

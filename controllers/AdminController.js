@@ -56,9 +56,6 @@ class AdminController{
         catch(e){
             next(e)
         }
-        finally{
-            file.buffer = null;
-        }
     }
 
     async updateProductSection(req, res, next){
@@ -72,9 +69,6 @@ class AdminController{
         }
         catch(e){
             next(e)
-        }
-        finally{
-            file.buffer = null;
         }
     }
 
@@ -104,20 +98,16 @@ class AdminController{
 
     async createProduct(req, res, next){
         try{
-            const files = req.files;
+            const imagesFiles = req.files.images;
+            const sizeFile = req.files.size ? req.files.size[0] : null;
             const product = JSON.parse(req.body.data);
             if(!product.name || !product.info || !product.images.length) 
                 throw RequestError.BadRequest('Одно из обязательных полей пустое(product.name, product.info, product.images.length)')
-            await adminService.createProduct(product, files)
+            await adminService.createProduct(product, imagesFiles, sizeFile)
             res.json({message: `Продукция успешно добавлена`})
         }
         catch(e){
             next(e)
-        }
-        finally{
-            req.files.map(file => {
-                file.buffer = null;
-            })
         }
     }
 
@@ -133,9 +123,6 @@ class AdminController{
         catch(e){
             next(e)
         }
-        finally{
-            file.buffer = null;
-        }
     }
 
     async updateCertificate(req, res, next){
@@ -149,9 +136,6 @@ class AdminController{
         }
         catch(e){
             next(e)
-        }
-        finally{
-            file.buffer = null;
         }
     }
 
@@ -258,20 +242,16 @@ class AdminController{
 
     async updateProduct(req, res, next){
         try{
-            const files = req.files;
+            const imagesFiles = req.files.images;
+            const sizeFile = req.files.size ? req.files.size[0] : null;
             const product = JSON.parse(req.body.data);
             if(!product.id || !product.name || !product.info || !product.images.length) 
                 throw RequestError.BadRequest('Одно из обязательных полей пустое(product.id, product.name, product.info, product.images.length)')
-            await adminService.updateProduct(product, files)
+            await adminService.updateProduct(product, imagesFiles, sizeFile)
             res.json({message: 'Успешное обновление'})
         }
         catch(e){
             next(e)
-        }
-        finally{
-            req.files.map(file => {
-                file.buffer = null;
-            })
         }
     }
 
@@ -394,11 +374,6 @@ class AdminController{
         catch(e){
             next(e)
         }
-        finally{
-            req.files.map(file => {
-                file.buffer = null;
-            })
-        }
     }
 
     async updateInformationDisclosure(req, res, next){
@@ -412,11 +387,6 @@ class AdminController{
         }
         catch(e){
             next(e)
-        }
-        finally{
-            req.files.map(file => {
-                file.buffer = null;
-            })
         }
     }
 

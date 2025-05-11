@@ -5,8 +5,8 @@ const adminController = require('../controllers/AdminController')
 const CheckRoleMiddleware = require('../middleware/CheckRoleMiddleware')
 const upload = require('../config/multer.config');
 
-adminRouter.post('/product/create', upload.image.array('images'), adminController.createProduct)
-adminRouter.post('/product/update', upload.image.array('images'), adminController.updateProduct)
+adminRouter.post('/product/create', upload.mixed, adminController.createProduct)
+adminRouter.post('/product/update', upload.mixed, adminController.updateProduct)
 adminRouter.post('/product/delete', adminController.deleteProduct)
 adminRouter.post('/product/swap', adminController.swapProduct)
 

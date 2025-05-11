@@ -54,8 +54,8 @@ class ImageService{
         return await Image.destroy({where: {id}}).catch(e => {throw DataBase.Conflict(e.message)})
     }
 
-    async deleteAll(productId, productSectionId){
-        const images = await this.get(productId, productSectionId)
+    async deleteAll(productId){
+        const images = await this.get(productId)
         await Promise.all(images.map(async (image) => {
             await this.delete(image.id)
             const p = path.join(__dirname, '..', image.url)

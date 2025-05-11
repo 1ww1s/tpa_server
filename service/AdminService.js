@@ -21,6 +21,7 @@ const informationDisclosureService = require('./InformationDisclosureService')
 const deleteFileService = require('./DeleteFileService')
 const path = require('path')
 const fileProcessing = require('../middleware/FileProcessing')
+const sizeService = require('./SizeService')
 
 class AdminService{
 
@@ -54,8 +55,12 @@ class AdminService{
         }
     }
 
-    async deleteProductSection(productSectionId){
-        await imageService.deleteAll(null, productSectionId)
+    async deleteProductSection(productSectionId){  // здесь не правильно и помотреть другие delete, где удаляется один файл
+        const imageData = await imageService.get(null, productSectionId)
+        if(!imageData){
+            throw DataBase.NotFound('Изображение не найдено')
+        }
+        await imageService.delete(imageData.id)
         await productSectionService.delete(productSectionId)
     }
 
@@ -63,10 +68,10 @@ class AdminService{
         await productSectionService.swap(items)
     }
 
-    async createProduct(product, files){
+    async createProduct(product, files, sizeFile){
         const productSectionData = await productSectionService.get(null, product.groupName) 
         if(!productSectionData) throw RequestError.BadRequest('Такого названия раздела продукции не существует')
-        await productService.create(productSectionData.id, product, files)
+        await productService.create(productSectionData.id, product, files, sizeFile)
     }
 
     async createCertificate(certificate, file){
@@ -164,11 +169,29 @@ class AdminService{
         await productService.swap(items)
     }
 
-    async updateProduct(product, files){
+    async updateProduct(product, files, sizeFile){
         await productService.update(product)
         await infoService.update(product)
         const processedImages = await fileProcessing.images('product', files)
         await imageService.updateAll(product.id, product.images, processedImages)
+        if(sizeFile){
+            const old = await sizeService.get(product.id)
+            const processedImages = await fileProcessing.files('size', [sizeFile])
+            if(old){
+                await sizeService.deleteFile(product.id)
+                await sizeService.update(old.id, processedImages[0].path)
+            }
+            else{
+                await sizeService.create(processedImages[0].path, product.id)
+            }
+        }
+        else{
+            const old = await sizeService.get(product.id)
+            if(old){
+                await sizeService.deleteFile(product.id)
+                await sizeService.delete(old.id)
+            }
+        }
         await functionService.update(product.id, product.functions)
         await monAndIndParamService.update(product.id, product.monAndIndParams)
         await deliverySetService.updateAll(product.id, product.deliverySet)

@@ -11,11 +11,12 @@ const infoService = require('./InfoService')
 const productSectionService = require('./ProductSectionService')
 const { Op } = require('sequelize')
 const fileProcessing = require('../middleware/FileProcessing')
+const sizeService = require('./SizeService')
 
 
 class ProductService {
 
-    async create(productSectionId, productData, files){
+    async create(productSectionId, productData, files, sizeFile){
         const nameSlug = slug(productData.name)
         const index = await Product.max('index', {where: productSectionId})
         const product = await Product.create({name: productData.name, slug: nameSlug, index: index + 1, productSectionId})
@@ -28,6 +29,10 @@ class ProductService {
         await monAndIndParamService.create(productData.monAndIndParams, product.id)
         await techCharacteristicService.createAll(productData.techCharacteristics, product.id)
         const processedImages = await fileProcessing.images('product', files)
+        if(sizeFile){
+            const processedImages = await fileProcessing.files('size', [sizeFile])
+            await sizeService.create(processedImages[0].path, product.id)
+        }
         await imageService.createAll(productData.images.map((pImage, ind) => ({name: pImage.name, url: processedImages[ind].path})), product.id)
     }
 
@@ -41,6 +46,7 @@ class ProductService {
         const deliverySet = (await deliverySetService.get(productData.id)).map(ds => { return {id: ds.id, name: ds.name, numb: ds.numb, note: ds.note} })
         const modifications = (await modificationService.get(productData.id)).map(m => { return {id: m.id, name: m.name, diesel: m.diesel, note: m.note} })
         const techCharacteristics = await techCharacteristicService.getAll(productData.id)
+        const size = await sizeService.get(productData.id)
 
         return {
             id: productData.id,
@@ -51,7 +57,12 @@ class ProductService {
             monAndIndParams,
             deliverySet,
             modifications,
-            techCharacteristics
+            techCharacteristics,
+            size: size ? {
+                id: size.id,
+                name: '',
+                url: size.url
+            } : {name: ''}
         }
     }
 

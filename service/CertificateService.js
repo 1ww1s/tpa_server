@@ -14,9 +14,12 @@ class CertificateService {
 
     async delete(id){
         const old = await this.get(null, id)
+        if(!old){
+            throw DataBase.NotFound(`Сертификат с id=${id} не найден`)
+        }
+        await Certificate.destroy({where:{id}}).catch(e => {throw DataBase.Conflict(e.message)})
         const p = path.join(__dirname, '..', old.imageUrl)
         await deleteFileService.safeDeleteFile(p)
-        await Certificate.destroy({where:{id}}).catch(e => {throw DataBase.Conflict(e.message)})
     }
 
     async get(name, id){

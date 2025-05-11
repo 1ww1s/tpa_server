@@ -142,6 +142,12 @@ const File = sequelize.define('file', {
     index: {type: DataTypes.INTEGER},
 })
 
+const Size = sequelize.define('size', {
+    id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
+    url: {type: DataTypes.STRING(400)},
+})
+
+
 
 
 InformationDisclosure.hasMany(File, {onDelete: 'CASCADE'})
@@ -164,6 +170,9 @@ Info.belongsTo(ProductSection)
 
 Product.hasOne(Info, {onDelete: 'CASCADE'})
 Info.belongsTo(Product)
+
+Product.hasOne(Size, {onDelete: 'CASCADE'})
+Size.belongsTo(Product)
 
 Product.hasMany(DeliverySet, {onDelete: 'CASCADE'})
 DeliverySet.belongsTo(Product)
@@ -197,6 +206,7 @@ MonAndIndParam.belongsTo(Product)
 
 
 module.exports = {
+    Size,
     Requisite,
     Certificate,
     User,

@@ -19,6 +19,26 @@ module.exports = {
     }
   }),
 
+  mixed: multer({
+    storage: multer.memoryStorage(), // Теперь используем memoryStorage для обработки Sharp
+    fileFilter: (req, file, cb) => {
+      const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'];
+      if (allowedTypes.includes(file.mimetype)) {
+        cb(null, true);
+      } else {
+        cb(new Error('Invalid file type. Only JPEG, PNG, WEBP and PDF are allowed!'));
+      }
+    },
+    limits: {
+      fileSize: 25 * 1024 * 1024 // 25MB
+    },
+    
+  }).fields([
+    { name: 'images' },
+    { name: 'size' },
+  ]),
+
+
   // file: multer({ 
   //   storage: multer.diskStorage({
   //     destination: function (req, file, cb) {
