@@ -2,16 +2,13 @@ const path = require("path")
 const DataBase = require("../error/DataBaseError")
 const fileProcessing = require("../middleware/FileProcessing")
 const { LatestDevelopment } = require("../models/models")
-const ImageService = require("./ImageService")
-const ProductSectionService = require("./ProductSectionService")
-const ProductService = require("./ProductService")
 const deleteFileService = require("./DeleteFileService")
 
 class LatestDevelopmentService {
 
     async create(title, link, file){
         const count = await LatestDevelopment.count().catch(e => {throw DataBase.Conflict(e.message)})
-        if(count === 4) throw DataBase.Conflict('Достигнуто максимальное количество последних разработок, удалите одну из них и попробуйте снова')
+        // if(count === 4) throw DataBase.Conflict('Достигнуто максимальное количество последних разработок, удалите одну из них и попробуйте снова')
         const processedImage = await fileProcessing.image('development', file)
         await LatestDevelopment.create(
             {title, link, imageUrl: processedImage.path, index: count}

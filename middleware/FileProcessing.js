@@ -8,7 +8,7 @@ const FileProcessing = {
     async image(startNameFile, file) {
         if (!file) return null;
         try {
-            const uploadDir = path.join(__dirname, '../uploads');
+            const uploadDir = path.join(__dirname, '../../uploads');
             if (!fs.existsSync(uploadDir)) {
                 fs.mkdirSync(uploadDir, { recursive: true });
             }
@@ -39,7 +39,7 @@ const FileProcessing = {
     async images(startNameFile, files) {
         try {
             if(!files) return null
-            const uploadDir = path.join(__dirname, '../uploads');
+            const uploadDir = path.join(__dirname, '../../uploads');
             if (!fs.existsSync(uploadDir)) {
                 fs.mkdirSync(uploadDir, { recursive: true });
             }
@@ -72,7 +72,7 @@ const FileProcessing = {
     async files(startNameFile, files){
         try {
             if(!files) return null
-            const uploadDir = path.join(__dirname, '../uploads/pdfs');
+            const uploadDir = path.join(__dirname, '../../uploads/pdfs');
             if (!fs.existsSync(uploadDir)) {
                 fs.mkdirSync(uploadDir, { recursive: true });
             }

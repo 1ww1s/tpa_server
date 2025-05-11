@@ -13,7 +13,6 @@ class SiteController{
 
     async getProduct(req, res, next){
         try {   
-            // await new Promise(resolve => setTimeout(resolve, 14000))
             const slug = req.params.slug;
             if(!slug) throw RequestError.BadRequest('Нет названия продукта')
             const product = await productService.getAll(slug)

@@ -71,7 +71,7 @@ class TechCharacteristicService {
             const unit = (await unitService.getById(tc.unitId)).value
             const value = (tc.items.map(i => (
                 {name: i.name, id: i.techCharacteristic_item.id, value: i.techCharacteristic_item.value}))
-            ).sort((a, b) => b.name.localeCompare(a.name))
+            ).sort((a, b) => a.id - b.id)
             
             return {
                 id: tc.id,
