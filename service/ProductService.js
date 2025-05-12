@@ -18,15 +18,15 @@ class ProductService {
 
     async create(productSectionId, productData, files, sizeFile){
         const nameSlug = slug(productData.name)
-        const index = await Product.max('index', {where: productSectionId})
+        const index = await Product.max('index', {where: {productSectionId}})
         const product = await Product.create({name: productData.name, slug: nameSlug, index: index + 1, productSectionId})
         .catch(e => {throw DataBase.UnprocessableEntity(e.message)})
 
         await infoService.create(productData.info, product.id, null)
-        await functionService.create(productData.functions, product.id)
         await deliverySetService.createAll(productData.deliverySet, product.id)
-        await modificationService.createAll(productData.modifications, product.id)
-        await monAndIndParamService.create(productData.monAndIndParams, product.id)
+        // await functionService.create(productData.functions, product.id)
+        // await modificationService.createAll(productData.modifications, product.id)
+        // await monAndIndParamService.create(productData.monAndIndParams, product.id)
         await techCharacteristicService.createAll(productData.techCharacteristics, product.id)
         const processedImages = await fileProcessing.images('product', files)
         if(sizeFile){
@@ -36,15 +36,10 @@ class ProductService {
         await imageService.createAll(productData.images.map((pImage, ind) => ({name: pImage.name, url: processedImages[ind].path})), product.id)
     }
 
-    async getAll(slug){
-        const productData = await Product.findOne({where: {slug}})
-        if(!productData) throw DataBase.NotFound('Продукт не найден')
+    async getBasic(productData){
         const productSection = await productSectionService.get(null, null, productData.productSectionId)
         const info = (await infoService.get(productData.id, null)).value;
-        const functions = (await functionService.get(productData.id)).value;
-        const monAndIndParams = (await monAndIndParamService.get(productData.id)).value;
         const deliverySet = (await deliverySetService.get(productData.id)).map(ds => { return {id: ds.id, name: ds.name, numb: ds.numb, note: ds.note} })
-        const modifications = (await modificationService.get(productData.id)).map(m => { return {id: m.id, name: m.name, diesel: m.diesel, note: m.note} })
         const techCharacteristics = await techCharacteristicService.getAll(productData.id)
         const size = await sizeService.get(productData.id)
 
@@ -53,16 +48,51 @@ class ProductService {
             name: productData.name,
             groupName: productSection?.title,
             info,
-            functions,
-            monAndIndParams,
             deliverySet,
-            modifications,
             techCharacteristics,
             size: size ? {
                 id: size.id,
                 name: '',
                 url: size.url
             } : {name: ''}
+        }
+    }
+
+    async getOptions(productId){
+        const functions = (await functionService.get(productId))?.value || '';
+        const monAndIndParams = (await monAndIndParamService.get(productId))?.value || '';
+        const modifications = await modificationService.getAll(productId)
+
+        return {
+            functions,
+            monAndIndParams,
+            modifications,
+        }
+    }
+
+    async getAll(slug, full, isBasic){
+        const productData = await Product.findOne({where: {slug}})
+        if(!productData) throw DataBase.NotFound('Продукт не найден')
+        if(full){
+            const product = await this.getBasic(productData)
+            const options = await this.getOptions(productData.id) 
+            return {
+                ...product,
+                ...options
+            }
+        }
+        else{
+            if(isBasic){
+                const product = await this.getBasic(productData)
+                return product
+            }
+            else{
+                const options = await this.getOptions(productData.id) 
+                return {
+                    id: productData.id,
+                    ...options
+                }
+            }
         }
     }
 

@@ -74,13 +74,20 @@ const DeliverySet = sequelize.define('deliverySet', {
     index: {type: DataTypes.INTEGER},
 })
 
+// /* Modification
+
 const Modification = sequelize.define('modification', {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
     name: {type: DataTypes.STRING},
-    diesel: {type: DataTypes.STRING},
-    note: {type: DataTypes.TEXT},
     index: {type: DataTypes.INTEGER},
 })
+
+const ModificationItem = sequelize.define('modification_item', {
+    id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
+    value: {type: DataTypes.STRING},
+})
+
+// */
 
 const TechCharacteristic = sequelize.define('techCharacteristic', {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
@@ -148,8 +155,6 @@ const Size = sequelize.define('size', {
 })
 
 
-
-
 InformationDisclosure.hasMany(File, {onDelete: 'CASCADE'})
 File.belongsTo(InformationDisclosure)
 
@@ -182,6 +187,9 @@ LatestDevelopment.belongsTo(Product)
 
 Product.hasMany(Modification, {onDelete: 'CASCADE'})
 Modification.belongsTo(Product)
+
+Modification.belongsToMany(Item, {through: ModificationItem, onDelete: 'CASCADE'})
+Item.belongsToMany(Modification, {through: ModificationItem, onDelete: 'CASCADE'})
 
 Product.hasMany(Image, {onDelete: 'CASCADE'})
 Image.belongsTo(Product)
@@ -217,6 +225,7 @@ module.exports = {
     Product, 
     DeliverySet, 
     Modification,
+    ModificationItem,
     TechCharacteristic,
     Function,
     MonAndIndParam,

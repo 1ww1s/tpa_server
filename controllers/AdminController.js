@@ -255,6 +255,17 @@ class AdminController{
         }
     }
 
+    async updateProductOptions(req, res, next){
+        try{
+            const {product} = req.body
+            await adminService.updateProductOptions(product)
+            res.json({message: 'Успешное обновление'})
+        }
+        catch(e){
+            next(e)
+        }
+    }
+
     async createUnit(req, res, next){
         try{
             const {value} = req.body;

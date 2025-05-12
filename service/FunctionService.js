@@ -1,3 +1,4 @@
+const DataBase = require('../error/DataBaseError')
 const { Function } = require('../models/models')
 
 class FunctionService{

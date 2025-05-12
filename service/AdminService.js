@@ -192,11 +192,17 @@ class AdminService{
                 await sizeService.delete(old.id)
             }
         }
+        // await functionService.update(product.id, product.functions)
+        // await monAndIndParamService.update(product.id, product.monAndIndParams)
+        // await modificationService.updateAll(product.id, product.modifications)
+        await deliverySetService.updateAll(product.id, product.deliverySet)
+        await techCharacteristicService.updateAll(product.id, product.techCharacteristics)
+    }
+    
+    async updateProductOptions(product){
         await functionService.update(product.id, product.functions)
         await monAndIndParamService.update(product.id, product.monAndIndParams)
-        await deliverySetService.updateAll(product.id, product.deliverySet)
         await modificationService.updateAll(product.id, product.modifications)
-        await techCharacteristicService.updateAll(product.id, product.techCharacteristics)
     }
 
     async createRole(value){

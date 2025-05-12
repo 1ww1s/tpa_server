@@ -7,6 +7,7 @@ const upload = require('../config/multer.config');
 
 adminRouter.post('/product/create', upload.mixed, adminController.createProduct)
 adminRouter.post('/product/update', upload.mixed, adminController.updateProduct)
+adminRouter.post('/product/updateOptions', adminController.updateProductOptions)
 adminRouter.post('/product/delete', adminController.deleteProduct)
 adminRouter.post('/product/swap', adminController.swapProduct)
 

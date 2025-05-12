@@ -4,6 +4,8 @@ const siteController = require('../controllers/SiteController')
 const siteRouter = Router()
 
 siteRouter.get('/product/data/:slug', siteController.getProduct)
+siteRouter.get('/product/dataBasic/:slug', siteController.getProductBasic)
+siteRouter.get('/product/dataOptions/:slug', siteController.getProductOptions)
 siteRouter.get('/product/images/:slug', siteController.getProductImages)
 siteRouter.get('/product/name/:slug', siteController.getProductNameBySlug)
 siteRouter.get('/product/arrayByName/:name', siteController.getProductsByName)

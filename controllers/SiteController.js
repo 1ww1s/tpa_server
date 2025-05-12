@@ -15,7 +15,31 @@ class SiteController{
         try {   
             const slug = req.params.slug;
             if(!slug) throw RequestError.BadRequest('Нет названия продукта')
-            const product = await productService.getAll(slug)
+            const product = await productService.getAll(slug, true)
+            res.json(product)
+        }
+        catch(e){
+            next(e)
+        }
+    }
+
+    async getProductBasic(req, res, next){
+        try {   
+            const slug = req.params.slug;
+            if(!slug) throw RequestError.BadRequest('Нет названия продукта')
+            const product = await productService.getAll(slug, false, true)
+            res.json(product)
+        }
+        catch(e){
+            next(e)
+        }
+    }
+
+    async getProductOptions(req, res, next){
+        try {   
+            const slug = req.params.slug;
+            if(!slug) throw RequestError.BadRequest('Нет названия продукта')
+            const product = await productService.getAll(slug, false, false)
             res.json(product)
         }
         catch(e){

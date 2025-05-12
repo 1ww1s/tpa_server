@@ -55,7 +55,14 @@ class TechCharacteristicService {
     }
 
     async getAll(productId){
-        const itemsData = await Item.findAll({where: {productId}, include: TechCharacteristic}).catch(e => {throw DataBase.Conflict(e.message)})
+        const itemsData = await Item.findAll({
+            where: {productId}, 
+            include: {
+                model: TechCharacteristic,
+                required: true,
+                attributes: []
+            }
+        }).catch(e => {throw DataBase.Conflict(e.message)})
         const techCharacteristicData = await TechCharacteristic.findAll(
             {
                 where: {productId}, 
