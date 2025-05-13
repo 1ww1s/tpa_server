@@ -46,7 +46,7 @@ class ProductService {
         return {
             id: productData.id,
             name: productData.name,
-            groupName: productSection?.title,
+            groupSlug: productSection?.slug,
             info,
             deliverySet,
             techCharacteristics,
@@ -126,7 +126,7 @@ class ProductService {
     async update(product){
         const oldProduct = await this.get(product.id)
         if(!oldProduct) throw DataBase.NotFound('Данный продукт не найден')
-        const productSection = await productSectionService.get(product.groupName)
+        const productSection = await productSectionService.get(null, product.groupSlug)
         const nameSlug = slug(product.name)
         await Product.update({name: product.name, slug: nameSlug, productSectionId: productSection.id}, {where: {id: product.id}})
     }
