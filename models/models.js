@@ -69,7 +69,7 @@ const LatestDevelopment = sequelize.define('latestDevelopment', {
 const DeliverySet = sequelize.define('deliverySet', {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
     name: {type: DataTypes.STRING},
-    numb: {type: DataTypes.STRING},
+    numb: {type: DataTypes.STRING(4)},
     note: {type: DataTypes.TEXT},
     index: {type: DataTypes.INTEGER},
 })
