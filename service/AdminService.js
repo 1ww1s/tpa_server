@@ -70,7 +70,7 @@ class AdminService{
     }
 
     async createProduct(product, files, sizeFile){
-        const productSectionData = await productSectionService.get(null, product.groupName) 
+        const productSectionData = await productSectionService.get(null, product.groupSlug) 
         if(!productSectionData) throw RequestError.BadRequest('Такого названия раздела продукции не существует')
         await productService.create(productSectionData.id, product, files, sizeFile)
     }
