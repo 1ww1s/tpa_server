@@ -69,6 +69,36 @@ const FileProcessing = {
         }
     },
 
+    async file(startNameFile, file) {
+        if (!file) return null;
+        try {
+            const uploadDir = path.join(__dirname, '../../uploads/pdfs');
+            if (!fs.existsSync(uploadDir)) {
+                fs.mkdirSync(uploadDir, { recursive: true });
+            }
+        
+            const filename = `${startNameFile}-${Math.round(Math.random() * 1E9)}.pdf`;
+            const filepath = path.join(uploadDir, filename);
+        
+            fs.writeFile(filepath, file.buffer, (err) => {
+                if (err) {
+                      return res.status(500).send('Ошибка сохранения файла: ' + err.message);
+                    }
+                }
+            )
+        
+            // Сохраняем метаданные для контроллера
+            const processedFile = {
+                filename,
+                path: `/uploads/pdfs/${filename}`
+            };
+            return processedFile
+        } 
+        catch (err) {
+            throw RequestError.BadRequest(err.message);
+        }
+    },
+
     async files(startNameFile, files){
         try {
             if(!files) return null
@@ -77,7 +107,7 @@ const FileProcessing = {
                 fs.mkdirSync(uploadDir, { recursive: true });
             }
     
-            const processedImages = []
+            const processedFiles = []
             await Promise.all(files.map(async (file, ind) => {
                 const filename = `${startNameFile}-${Date.now()}-${ind + 1}.pdf`;
                 const filepath = path.join(uploadDir, filename);
@@ -88,12 +118,12 @@ const FileProcessing = {
                     }
                 })
 
-                processedImages[ind] = {
+                processedFiles[ind] = {
                     filename,
                     path: `/uploads/pdfs/${filename}`
                 }
             }))
-            return processedImages;
+            return processedFiles;
         } 
         catch (err) {
             throw RequestError.BadRequest(err.message);

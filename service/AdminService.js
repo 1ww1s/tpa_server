@@ -22,6 +22,7 @@ const deleteFileService = require('./DeleteFileService')
 const path = require('path')
 const fileProcessing = require('../middleware/FileProcessing')
 const sizeService = require('./SizeService')
+const companyCardService = require('./CompanyCardService')
 
 class AdminService{
 
@@ -102,6 +103,9 @@ class AdminService{
 
     async updateRequisite(requisite){
         await requisiteService.update(requisite.id, requisite.name, requisite.value)
+    }
+    async updateCompanyCard(file){
+        await companyCardService.update(file)
     }
     async deleteRequisite(requisiteId){
         await requisiteService.delete(requisiteId)

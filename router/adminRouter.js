@@ -30,6 +30,7 @@ adminRouter.post('/certificate/delete', adminController.deleteCertificate)
 adminRouter.post('/requisite/create', adminController.createRequisite)
 adminRouter.post('/requisite/update', adminController.updateRequisite)
 adminRouter.post('/requisite/delete', adminController.deleteRequisite)
+adminRouter.post('/companyCard/update', upload.image.single('file'), adminController.updateCompanyCard)
 
 adminRouter.post('/unit/create', adminController.createUnit)
 adminRouter.post('/unit/update', adminController.updateUnit)

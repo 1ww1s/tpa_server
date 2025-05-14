@@ -42,5 +42,6 @@ siteRouter.post('/latestDevelopment', siteController.getLatestDevelopment)
 siteRouter.get('/latestDevelopments/items', siteController.getLatestDevelopmentsItems)
 
 siteRouter.get('/requisite', siteController.getRequisites)
+siteRouter.get('/companyCard', siteController.getCompanyCard)
 
 module.exports = siteRouter

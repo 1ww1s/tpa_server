@@ -6,6 +6,7 @@ const contactService = require('../service/ContactService')
 const certificateService = require('../service/CertificateService');
 const partnerService = require("../service/PartnerService");
 const requisiteService = require("../service/RequisiteService");
+const companyCardService = require("../service/CompanyCardService");
 const latestDevelopmentService = require("../service/LatestDevelopmentService");
 const informationDisclosureService = require("../service/InformationDisclosureService");
 
@@ -340,6 +341,16 @@ class SiteController{
         try{
             const requisites = await requisiteService.getAll()
             res.json(requisites)
+        }
+        catch(e){
+            next(e)
+        }
+    }
+
+    async getCompanyCard(_, res, next){
+        try{
+            const companyCard = await companyCardService.get()
+            res.json(companyCard)
         }
         catch(e){
             next(e)

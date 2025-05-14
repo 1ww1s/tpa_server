@@ -13,6 +13,11 @@ const Role = sequelize.define('role', {
     value: {type: DataTypes.STRING, unique: true}
 })
 
+const CompanyCard = sequelize.define('companyCard', {
+    id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
+    url: {type: DataTypes.STRING(400)},
+})
+
 const RefreshToken = sequelize.define('token', {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
     token: {type: DataTypes.STRING},
@@ -214,6 +219,7 @@ MonAndIndParam.belongsTo(Product)
 
 
 module.exports = {
+    CompanyCard,
     Size,
     Requisite,
     Certificate,

@@ -177,6 +177,18 @@ class AdminController{
         }
     }
 
+    async updateCompanyCard(req, res, next){
+        try{
+            const file = req.file;
+            if(!file) throw RequestError.BadRequest('Нет файла')
+            await adminService.updateCompanyCard(file)
+            res.json({message: `Карточка предприяти успешно обновлена`})
+        }
+        catch(e){
+            next(e)
+        }
+    }
+
     async deleteRequisite(req, res, next){
         try{
             const {requisiteId} = req.body;
