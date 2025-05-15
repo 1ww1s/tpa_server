@@ -19,6 +19,15 @@ class MonAndIndParamService {
         return await MonAndIndParam.destroy({where: {productId}}).catch(e => {throw DataBase.Conflict(e.message)})
     }
 
+    async isEmpty(productId){
+        let isEmpty = true;
+        const count = await MonAndIndParam.count({where: {productId}}).catch(e => {throw DataBase.Conflict(e.message)})
+        if(count){
+            isEmpty = false;
+        }
+        return isEmpty
+    }
+
 }
 
 

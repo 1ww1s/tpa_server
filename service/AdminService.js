@@ -204,8 +204,19 @@ class AdminService{
     }
     
     async updateProductOptions(product){
-        await functionService.update(product.id, product.functions)
-        await monAndIndParamService.update(product.id, product.monAndIndParams)
+        let isEmpty = await functionService.isEmpty(product.id)
+        if(isEmpty){
+            await functionService.create(product.functions, product.id)
+        }else{
+            await functionService.update(product.id, product.functions)
+        }
+        isEmpty = await monAndIndParamService.isEmpty(product.id)
+        if(isEmpty){
+            await monAndIndParamService.create(product.monAndIndParams, product.id)
+        }
+        else{
+            await monAndIndParamService.update(product.id, product.monAndIndParams)
+        }
         await modificationService.updateAll(product.id, product.modifications)
     }
 
