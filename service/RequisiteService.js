@@ -20,7 +20,7 @@ class RequisiteService{
     }
 
     async getAll(){
-        const requisites = await Requisite.findAll()
+        const requisites = await Requisite.findAll({order: ['id']})
         return requisites.map(requisite => {return {id: requisite.id, name: requisite.name, value: requisite.value}})
     }
 

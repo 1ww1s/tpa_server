@@ -88,7 +88,7 @@ class TechCharacteristicService {
                 value: value.map(v => ({id: v.id, value: v.value}))
             }
         }))
-        const itemsDataSort = itemsData.map(i => { return { id: i.id, name: i.name }}).sort((a, b) => a.id - b.id)
+        const itemsDataSort = itemsData.map( i => { return { id: i.id, name: i.name }}).sort((a, b) => a.id - b.id)
         return{
             items: itemsDataSort,
             data: techCharacteristics
