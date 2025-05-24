@@ -189,7 +189,7 @@ class AdminService{
                 await sizeService.create(processedImages[0].path, product.id)
             }
         }
-        else{
+        else if(!product.size?.id){
             const old = await sizeService.get(product.id)
             if(old){
                 await sizeService.deleteFile(product.id)
