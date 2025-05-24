@@ -43,7 +43,7 @@ class FileService {
         await Promise.all(oldFiles.map(async file => {
             if(!isPresent[file.id]) {
                 await this.delete(file.id)
-                const p = path.join(__dirname, '..', file.url)
+                const p = path.join(__dirname, '../..', file.url)
                 await deleteFileService.safeDeleteFile(p)
             }
         }))

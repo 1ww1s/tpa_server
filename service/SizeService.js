@@ -23,7 +23,7 @@ class SizeService{
 
     async deleteFile(productId){
         const image = await this.get(productId)
-        const p = path.join(__dirname, '..', image.url)
+        const p = path.join(__dirname, '../..', image.url)
         await deleteFileService.safeDeleteFile(p)
     }
 }

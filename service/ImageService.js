@@ -44,7 +44,7 @@ class ImageService{
         await Promise.all(oldImages.map(async i => {
             if(!isPresent[i.id]){
                 await this.delete(i.id)
-                const p = path.join(__dirname, '..', i.url)
+                const p = path.join(__dirname, '../..', i.url)
                 await deleteFileService.safeDeleteFile(p)
             }                
         }))
@@ -58,7 +58,7 @@ class ImageService{
         const images = await this.get(productId)
         await Promise.all(images.map(async (image) => {
             await this.delete(image.id)
-            const p = path.join(__dirname, '..', image.url)
+            const p = path.join(__dirname, '../..', image.url)
             await deleteFileService.safeDeleteFile(p)
         }))
     }

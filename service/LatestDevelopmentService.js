@@ -19,7 +19,7 @@ class LatestDevelopmentService {
         const latestDevelopment = await this.getById(id)
         if(!latestDevelopment) throw DataBase.NotFound(`Последняя разработка с id=${id} не найдена`)
         await LatestDevelopment.destroy({where: {id}}).catch(e => {throw DataBase.Conflict(e.message)})
-        const p = path.join(__dirname, '..', latestDevelopment.imageUrl)
+        const p = path.join(__dirname, '../..', latestDevelopment.imageUrl)
         await deleteFileService.safeDeleteFile(p)
     }
 
